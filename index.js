@@ -1,26 +1,37 @@
 const express = require("express")
 const cors = require("cors")
-const mongoose = require("mongoose")
 const logger = require('morgan');
+const mongoose = require("mongoose")
+
+
+
+
+
+const signController = require('./controllers/signController')
+const mainController =require('./controllers/mainController');
+const userRouter = require('./routes/user')
+const postRouter = require('./routes/post')
+const commentRouter = require('./routes/comment')
+
+
+require("dotenv").config();
+const User = require('./models/model')
+const Post = require('./models/model')
+
 
 const app = express()
 const port = process.env.PORT || 5000;
 
-
-
-const mainRouter = require('./routes/main');
-require("dotenv").config();
-
 app.use(express.json()); //req.body 접근하게 해주는 미들웨어
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({
-  //origin: 'http://localhost:3000',
+  origin: 'http://localhost:3000',
   methods: ['GET, POST, OPTIONS, PUT'],
   credentials: true
 }));
 
 
-
+//console.log(process.env.SRV)
 mongoose.connect(process.env.SRV,{
     useNewUrlParser:true,
     useCreateIndex:true,
@@ -30,9 +41,53 @@ mongoose.connect(process.env.SRV,{
 }).catch((err)=>{
     console.log(err)
 })
+//🔴몽고DB사용법은 userController에서 설명드렸습니다.
 
-app.use('/', mainRouter);
 
+
+
+
+app.use('/', async (req,res)=>{
+//🍀 User seeding test////////////////
+const newUser= new User({
+    email:"coco@codestates.com",
+    password:'55535'
+})
+newUser.save().then(()=>{
+    console.log("new user saved")
+ })
+
+//🍀 POst seeding test////////////////
+
+// const newPost= new Post({
+//     title:'wow',
+//     content:'wwwwwww',
+//     image:'x',
+// })
+// newPost.save().then(()=>{
+//     console.log("new post saved")
+// })
+/////////////////////////////
+
+    res.send("hello world").status(200)
+});
+
+app.post('/signin', signController.signiInController)
+app.post('/signout', signController.signOutController)
+app.post('/signup', signController.signUpController)
+app.post('/refreshtoken', signController.refreshTokenController)
+
+
+app.get('/main',mainController.mainController)
+//?sort={sort}
+app.get('/search',mainController.searchController)
+//?q={queryString}
+
+
+
+app.use('/user', userRouter)
+app.use('/post', postRouter)
+app.use('/comment', commentRouter)
 
 
 
