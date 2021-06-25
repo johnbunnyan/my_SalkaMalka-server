@@ -67,14 +67,36 @@ app.get('/search',mainController.searchController)
 app.use('/', (req,res,next)=>{
 
     
-    //🍀 User seeding(create) test////////////////
+    // //🍀 User seeding(create) test////////////////
     // const newUser= new User({
-    //     email:"coco@codestates.com",
-    //     password:'55535'
+    //     email:"jenny@codestates.com",
+    //     password:'8888'
     // })
     // newUser.save().then(()=>{
     //     console.log("new user saved")
-    //})
+    // })
+
+     //🍀 post.comment seeding(create) test////////////////
+     //console.log(Post)
+     
+     Post.findById('60d60036f605cd8c66a29aa2')
+    .then((doc)=>{
+        console.log(doc)
+    doc.comment.push(
+        {
+    type:true,
+    like:22,
+     //content:"후회할 거야",
+    userId:'60d5ddd7be68577ec8df630b'
+    }
+    )
+    doc.save()
+    })
+.then((out)=>{
+        console.log("new comment saved")
+        res.json(out).status(200)
+    })
+
     
     //🍀 Post seeding(create) test////////////////
     // console.log(Post)

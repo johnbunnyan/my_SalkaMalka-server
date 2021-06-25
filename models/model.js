@@ -4,7 +4,7 @@ const schema = mongoose.Schema;
 
 
 const UserSchema = new schema({
-    _id:schema.Types.ObjectId,
+  
     email:{
     type:String,
     required:true,
@@ -33,7 +33,8 @@ const CommentSchema = new schema({
         required:true,
     },
     content:{
-        type:String
+        type:String,
+        default:'no comment'
     },
     userId:{type:schema.Types.ObjectId, ref:'User', required:true}
 
