@@ -4,7 +4,8 @@ const schema = mongoose.Schema;
 
 
 const UserSchema = new schema({
-email:{
+    _id:schema.Types.ObjectId,
+    email:{
     type:String,
     required:true,
     unique:true
@@ -15,7 +16,8 @@ password:{
     unique:true
 },
 provider:{
-    type:String
+    type:String,
+    default:'기본 이용자'
 }
 },{timestamps:true}
 )
@@ -24,17 +26,16 @@ provider:{
 const CommentSchema = new schema({
     type:{
         type:Boolean,
+        required:true,
     },
     like:{
-        type:Number
+        type:Number,
+        required:true,
     },
     content:{
         type:String
     },
-    userId:{
-
-    },
-    userId:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}]
+    userId:{type:schema.Types.ObjectId, ref:'User', required:true}
 
 },{timestamps:true})
 
@@ -48,13 +49,22 @@ const PostSchema = new schema({
         required:true,
     },
     image:{
-        type:String
+        type:String,
+        default:''
     },
-    children:[CommentSchema],
+    isOpen:{
+        type:Boolean,
+        default:true
+    },
+    comment:{
+        type:[CommentSchema],
+        default:[]
+    },
 //또는 child: comment
-    userId:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}]
+    userId:{type:schema.Types.ObjectId, ref:'User', required:true}
 
-    },{timestamps:true}
+    },
+    {timestamps:true}
     )
 
 
@@ -70,4 +80,4 @@ const PostSchema = new schema({
 // })
 const User = mongoose.model("User",UserSchema)
 const Post = mongoose.model("Post", PostSchema)
-module.exports = User, Post
+module.exports = {User,Post}
