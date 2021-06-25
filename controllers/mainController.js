@@ -10,10 +10,10 @@ module.exports = {
 
     switch (sort) {
       case 'date':
-        const orderByDate = await Post.find({}, { sort: { _id: 1 } }).pretty();
+        const orderByDate = await Post.find().sort({ createdAt: 1 }).pretty();
         // {
         //   _id, // postId
-        //   userId
+        //   userId,
         //   title,
         //   image,
         //   content,
@@ -26,7 +26,10 @@ module.exports = {
         //       content,
         //       userId: { $ref, $id, $db }
         //     }
-        //   ]
+        //   ],
+        //   sara, 사라는 투표 수
+        //   mara, 마라는 투표 수
+        //   saraToMara = Math.abs((sara / mara) - 1)
         // }
 
         if (orderByDate) {
@@ -38,9 +41,18 @@ module.exports = {
         break;
 
       case 'popular':
-        const query = { $group: { _id: '$_id', commentCount: { $comment: { $sum: 1 } } } };
+        const query = { $project: {
+          _id: 1,
+          userId: 1,
+          title: 1,
+          image: 1,
+          content: 1,
+          isOpen: 1,
+          comment: 1,
+          commentCount: { $add: [ "$sara", "$mara" ] } } 
+        };
         const sort = { $sort: { commentCount: -1 } };
-        const orderByPopular = await Post.aggregate([ query, sort ]);
+        const orderByPopular = await Post.aggregate([ query, sort ]).pretty();
 
         if (orderByPopular) {
           res.status(200).send(orderByPopular);
@@ -51,7 +63,17 @@ module.exports = {
         break;
 
       case 'hotTopic':
-        const orderByHotTopic = await Post.find({}, { sort: { _id: 1 } }).pretty();
+        const query = { $project: {
+          _id: 1,
+          userId: 1,
+          title: 1,
+          image: 1,
+          content: 1,
+          isOpen: 1,
+          comment: 1
+        }};
+        const sort = { $sort: { saraToMara: -1 } };
+        const orderByHotTopic = await Post.aggregate([ query, sort ]).pretty();
 
         if (orderByHotTopic) {
           res.status(200).send(orderByHotTopic);
@@ -70,7 +92,7 @@ module.exports = {
 
   searchController: async (req, res) => {
     const queryString = req.query.q;
-    const searchResult = await Post.find({ title: /${queryString}/ }).pretty();
+    const searchResult = await Post.find({ title: { $regex: `${queryString}` } }).pretty();
 
     if (searchResult) {
       res.status(200).send(searchController);

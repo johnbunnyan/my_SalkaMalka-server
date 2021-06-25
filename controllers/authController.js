@@ -59,13 +59,13 @@ module.exports = {
       res.status(409).send('이미 가입된 이메일이에요.');
     } else if (!userInfo) {
       const newUser = { email: req.body.email, password: req.body.password, provider: 'local' };
-      const result = await User.insertOne(newUser);
+      const insertMe = await User.insertOne(newUser);
 
-      if (result.insertedCount === 0) {
+      if (insertMe.insertedCount === 0) {
         console.log('insert err');
         res.status(500).send('err');
       } else {
-        console.log(`Insert count: ${result.insertedCount}, _id: ${result.insertedId}`);
+        console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
         res.status(201).send('살까말까에 오신 것을 환영합니다.');
       }
     }
@@ -106,13 +106,13 @@ module.exports = {
     // 동일 유저를 찾을 수 없어 새로운 유저 생성
     if (!googleUserInfo) {
       const newUser = { email: req.body.email, password: '', provider: 'google' };
-      const result = await User.insertOne(newUser);
+      const insertMe = await User.insertOne(newUser);
 
-      if (result.insertedCount === 0) {
+      if (insertMe.insertedCount === 0) {
         console.log('insert err');
         res.status(500).send('err');
       } else {
-        console.log(`Insert count: ${result.insertedCount}, _id: ${result.insertedId}`);
+        console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
         res.status(201).send('살까말까에 오신 것을 환영합니다.');
       }
     }
@@ -152,13 +152,13 @@ module.exports = {
     // 동일 유저를 찾을 수 없어 새로운 유저 생성
     if (!kakaoUserInfo) {
       const newUser = { email: req.body.email, password: '', provider: 'kakao' };
-      const result = await User.insertOne(newUser);
+      const insertMe = await User.insertOne(newUser);
 
-      if (result.insertedCount === 0) {
+      if (insertMe.insertedCount === 0) {
         console.log('insert err');
         res.status(500).send('err');
       } else {
-        console.log(`Insert count: ${result.insertedCount}, _id: ${result.insertedId}`);
+        console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
         res.status(201).send('살까말까에 오신 것을 환영합니다.');
       }
     }
