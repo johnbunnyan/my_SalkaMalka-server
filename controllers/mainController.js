@@ -41,7 +41,7 @@ module.exports = {
         break;
 
       case 'popular':
-        const query = { $project: {
+        const query1 = { $project: {
           _id: 1,
           userId: 1,
           title: 1,
@@ -51,8 +51,8 @@ module.exports = {
           comment: 1,
           commentCount: { $add: [ "$sara", "$mara" ] } } 
         };
-        const sort = { $sort: { commentCount: -1 } };
-        const orderByPopular = await Post.aggregate([ query, sort ]).pretty();
+        const sort1 = { $sort: { commentCount: -1 } };
+        const orderByPopular = await Post.aggregate([ query1, sort1 ]).pretty();
 
         if (orderByPopular) {
           res.status(200).send(orderByPopular);
@@ -63,7 +63,7 @@ module.exports = {
         break;
 
       case 'hotTopic':
-        const query = { $project: {
+        const query2 = { $project: {
           _id: 1,
           userId: 1,
           title: 1,
@@ -72,8 +72,8 @@ module.exports = {
           isOpen: 1,
           comment: 1
         }};
-        const sort = { $sort: { saraToMara: -1 } };
-        const orderByHotTopic = await Post.aggregate([ query, sort ]).pretty();
+        const sort2 = { $sort: { saraToMara: -1 } };
+        const orderByHotTopic = await Post.aggregate([ query2, sort2 ]).pretty();
 
         if (orderByHotTopic) {
           res.status(200).send(orderByHotTopic);
@@ -84,7 +84,7 @@ module.exports = {
         break;
 
       default:
-        res.status(404).send();
+        res.sendStatus(404);
 
         break;
     } 

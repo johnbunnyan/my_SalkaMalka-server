@@ -37,15 +37,15 @@ mongoose.connect(process.env.SRV, {
 
 //🔴몽고DB사용법은 userController에서 설명드렸습니다.
 
-app.use('/', async (req, res)=>{
-//🍀 User seeding test////////////////
-const newUser= new User({
-    email:"coco@codestates.com",
-    password:'55535'
-})
-newUser.save().then(()=>{
-    console.log("new user saved")
- })
+// app.use('/', async (req, res)=>{
+// //🍀 User seeding test////////////////
+// const newUser= new User({
+//     email:"coco@codestates.com",
+//     password:'55535'
+// })
+// newUser.save().then(()=>{
+//     console.log("new user saved")
+//  })
 
 //🍀 Post seeding test////////////////
 
@@ -59,8 +59,8 @@ newUser.save().then(()=>{
 // })
 /////////////////////////////
 
-    res.send("hello world").status(200)
-});
+//     res.send("hello world").status(200)
+// });
 
 app.get('/main',mainController.mainController)
 //?sort={sort}

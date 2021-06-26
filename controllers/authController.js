@@ -5,10 +5,12 @@ require("dotenv").config();
 const { generateAccessToken, 
   generateRefreshToken,
   isAuthorized, 
-  checkRefreshToken 
+  checkRefreshToken,
 } = require('./tokenMethod');
 
 const User = require('../models/model');
+const { OAuth2Client } = require('google-auth-library')
+const client = new OAuth2Client('990259858397-e8j9lsf3a2h1276rt5f36m5cvmpi9imj.apps.googleusercontent.com')
 
 module.exports = {
   signInController: async (req, res) => {
@@ -23,15 +25,14 @@ module.exports = {
       const userId = userInfo._id;
       const accessToken = generateAccessToken({ userId, email, provider });
       const refreshToken = generateRefreshToken({ userId, email, provider });
-
+      const issueDate = new Date();
+      const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+      const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
+      
       res
       .cookie('refreshToken', refreshToken, { httpOnly: true })
       .status(200)
-      .json({
-        userId: userId,
-        email: email,
-        accessToken: accessToken
-      });
+      .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
     } else {
       res.status(500).send('err');
     }
@@ -43,7 +44,6 @@ module.exports = {
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
-      req.headers.authorization = ''; // 필요한가?
       res.clearCookie('refreshToken');
       res.status(200).send('다음에 또 찾아주세요.');
     } else {
@@ -73,6 +73,7 @@ module.exports = {
   
   refreshTokenController: async (req, res) => {
     const refreshTokenData = checkRefreshToken(req);
+
     if (!refreshTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (refreshTokenData) {
@@ -80,114 +81,155 @@ module.exports = {
       const userInfo = await User.findOne({ userId });
       
       if (!userInfo) {
-        res.status(404).send();
+        res.status(500).send('err');
       } else {
         const { email, provider } = userInfo;
         const userId = userInfo._id;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
+        const issueDate = new Date();
+        const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+        const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
 
+        const tokenInfo = {
+          accessToken,
+          accessTokenExpiry,
+          refreshTokenExpiry,
+          issueDate
+        }
+        
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)
-        .json({
-          userId: userId,
-          email: email,
-          accessToken: accessToken
-        });
+        .send(tokenInfo);
       }
     }
   },
 
   googleSignInController: async (req, res) => {
-    const query = { email: req.body.email, provider: 'google' };
-    const googleUserInfo = await User.findOne(query);
+    const authorization = req.headers["Authorization"] || req.headers["authorization"] || req.body.headers.Authorization;
 
-    // 동일 유저를 찾을 수 없어 새로운 유저 생성
-    if (!googleUserInfo) {
-      const newUser = { email: req.body.email, password: '', provider: 'google' };
-      const insertMe = await User.insertOne(newUser);
-
-      if (insertMe.insertedCount === 0) {
-        console.log('insert err');
-        res.status(500).send('err');
-      } else {
-        console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
-        res.status(201).send('살까말까에 오신 것을 환영합니다.');
-      }
-    }
-
-    // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
-    else if (googleUserInfo) {
-      const googleToken = isAuthorized(req);
-
-      if (!googleToken) {
+    if (!authorization) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else {
+      const token = authorization.split(" ")[1];
+      let email = ''
+      try {
+        const ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: '990259858397-e8j9lsf3a2h1276rt5f36m5cvmpi9imj.apps.googleusercontent.com'
+        })
+    
+        email = ticket.getPayload().email;
+      } catch (err) {
+        console.log(err);
         res.status(401).send('토큰이 유효하지 않아요.');
-      } else if (googleToken) {
-        const { email, provider } = userInfo;
-        const userId = userInfo._id;
+      }
+      console.log('email', email);
+      const query = { email: req.body.email, provider: 'google' };
+      const googleUserInfo = await User.findOne(query);
+
+      // 동일 유저를 찾을 수 없어 새로운 유저 생성
+      if (!googleUserInfo) {
+        console.log('you are new')
+        const newUser = { email: req.body.email, password: 'defaultgooglepassword', provider: 'google' };
+        const insertMe = new User(newUser)
+        .save()
+        .then(res => res)
+        .catch((err) => {
+          console.log(err);
+          res.status(500).send('err');
+        });
+        console.log(res)
+        const { email, provider } = res;
+        const userId = res._id;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
+        const issueDate = new Date();
+        const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+        const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
+        res
+        .cookie('refreshToken', refreshToken, { httpOnly: true })
+        .status(201)
+        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+      }
+
+      // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
+      else if (googleUserInfo) {
+        console.log('you exist')
+        const { email, provider } = googleUserInfo;
+        const userId = googleUserInfo._id;
+        const accessToken = generateAccessToken({ userId, email, provider });
+        const refreshToken = generateRefreshToken({ userId, email, provider });
+        const issueDate = new Date();
+        const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+        const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
 
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)
-        .json({
-          userId: userId,
-          email: email,
-          accessToken: accessToken
-        });
+        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
       }
-    }
-
-    else {
-        res.status(500).send('err')
+      
+      else {
+        res.status(500).send('err');
+      }
     }
   },
 
   kakaoSignInController: async (req, res) => {
-    const query = { email: req.body.email, provider: 'kakao' };
-    const kakaoUserInfo = await User.findOne(query);
+    const kakaoToken = isAuthorized(req);
 
-    // 동일 유저를 찾을 수 없어 새로운 유저 생성
-    if (!kakaoUserInfo) {
-      const newUser = { email: req.body.email, password: '', provider: 'kakao' };
-      const insertMe = await User.insertOne(newUser);
+    if (!kakaoToken) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else {
+      const query = { email: req.body.email, provider: 'kakao' };
+      const kakaoUserInfo = await User.findOne(query);
 
-      if (insertMe.insertedCount === 0) {
-        console.log('insert err');
-        res.status(500).send('err');
-      } else {
-        console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
-        res.status(201).send('살까말까에 오신 것을 환영합니다.');
+      // 동일 유저를 찾을 수 없어 새로운 유저 생성
+      if (!kakaoUserInfo) {
+        const newUser = { email: req.body.email, password: '', provider: 'kakao' };
+        const insertMe = await User.insertOne(newUser);
+
+        if (insertMe.insertedCount === 0) {
+          console.log('insert err');
+          res.status(500).send('err');
+        } else {
+          console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
+          const { email, provider } = userInfo;
+          const userId = userInfo._id;
+          const accessToken = generateAccessToken({ userId, email, provider });
+          const refreshToken = generateRefreshToken({ userId, email, provider });
+          const issueDate = new Date();
+          const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+          const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
+
+          res
+          .cookie('refreshToken', refreshToken, { httpOnly: true })
+          .status(201)
+          .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+        }
       }
-    }
 
-    // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
-    else if (kakaoUserInfo) {
-      const kakaoToken = isAuthorized(req);
-
-      if (!kakaoToken) {
-        res.status(401).send('토큰이 유효하지 않아요.');
-      } else if (kakaoToken) {
+      // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
+      else if (kakaoUserInfo) {
         const { email, provider } = userInfo;
         const userId = userInfo._id;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
+        const issueDate = new Date();
+        const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+        const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
 
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)
-        .json({
-          userId: userId,
-          email: email,
-          accessToken: accessToken
-        });
+        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+      }
+      
+      else {
+        res.status(500).send('err');
       }
     }
-
-    else {
-        res.status(500).send('err')
-    }
-  }
+  },
 }

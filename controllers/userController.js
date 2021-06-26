@@ -61,7 +61,7 @@ module.exports = {
         res.status(500).send('err');
       } else {
         console.log(`Delete count: ${deleteMe.deletedCount}`)
-        res.status(204).send();
+        res.sendStatus(204);
       }
     } else {
       res.status(500).send('err');
