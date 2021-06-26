@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
-
-
 const UserSchema = new schema({
   
     email:{
@@ -21,7 +19,6 @@ provider:{
 }
 },{timestamps:true}
 )
-
 
 const CommentSchema = new schema({
     type:{
