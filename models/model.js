@@ -21,10 +21,7 @@ provider:{
 )
 
 const CommentSchema = new schema({
-    type:{
-        type:Boolean,
-        required:true,
-    },
+   
     like:{
         type:Number,
         required:true,
@@ -54,6 +51,37 @@ const PostSchema = new schema({
         type:Boolean,
         default:true
     },
+    //type(사라/마라)와 comment(댓글)을 분리해서 간주
+    //요청의 바디에 type과 comment가 각각 있을 수도 있고 없을 수도 있고
+    //몽고디비의 특성을 잘 이해하지 못한거 아니냐는 질문에 대한 대답
+    //->쿼리를 계산해서 해오는 것을 떠나서 매 쿼리를 할때마다 효율이 떨어진다.
+    //->필요에 따라 모델링을 유연하게 이렇게 할 수 있는 것도 몽고디비의 장점이라고 생각
+    
+    
+    
+    // type:{
+    //     type:Boolean,
+    //     required:true,
+    // },
+    sara:{
+type:Number,
+required:true,
+default:0
+    },
+mara:{
+    type:Number,
+    required:true,
+    default:0
+    },
+
+    ratio:{
+        type:Number,
+        required:true,
+        default:0
+        },
+    
+        
+
     comment:{
         type:[CommentSchema],
         default:[]

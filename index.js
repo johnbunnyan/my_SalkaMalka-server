@@ -35,7 +35,7 @@ mongoose.connect(process.env.SRV, {
     console.log(err)
 })
 
-//🔴몽고DB사용법은 userController에서 설명드렸습니다.
+
 
 
 
