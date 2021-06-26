@@ -64,21 +64,21 @@ const PostSchema = new schema({
     //     required:true,
     // },
     sara:{
-type:Number,
-required:true,
-default:0
+    type:Number,
+    required:true,
+    default:0
     },
-mara:{
+    mara:{
     type:Number,
     required:true,
     default:0
     },
 
     ratio:{
-        type:Number,
-        required:true,
-        default:0
-        },
+    type:Number,
+    required:true,
+    default:0
+    },
     
         
 
