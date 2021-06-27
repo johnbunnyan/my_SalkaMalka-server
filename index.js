@@ -66,23 +66,23 @@ app.use('/', (req,res,next)=>{
      //🍀 post.comment seeding(create) test////////////////
      //console.log(Post)
      
-     Post.findById('60d60036f605cd8c66a29aa2')
-    .then((doc)=>{
-        console.log(doc)
-    doc.comment.push(
-        {
-    type:true,
-    like:22,
-     //content:"후회할 거야",
-    userId:'60d5ddd7be68577ec8df630b'
-    }
-    )
-    doc.save()
-    })
-.then((out)=>{
-        console.log("new comment saved")
-        res.json(out).status(200)
-    })
+//      Post.findById('60d60036f605cd8c66a29aa2')
+//     .then((doc)=>{
+//         console.log(doc)
+//     doc.comment.push(
+//         {
+//     type:true,
+//     like:22,
+//      //content:"후회할 거야",
+//     userId:'60d5ddd7be68577ec8df630b'
+//     }
+//     )
+//     doc.save()
+//     })
+// .then((out)=>{
+//         console.log("new comment saved")
+//         res.json(out).status(200)
+//     })
 
     
     //🍀 Post seeding(create) test////////////////
@@ -90,21 +90,21 @@ app.use('/', (req,res,next)=>{
     //이따가는 new Post()의 인자로 req.body주면 됨
     
     
-    // const newPost= new Post({
-    //     title:'몽고',
-    //     content:'디비디비',
-    //     image:'x',
-    //     userId:'60d4259b4751682e7e973021',
-    //     comment:{
-    //         type:false,
-    //         like:1,
-    //         userId:'60d4254dec6bbb2e33526cfb'
-    //     }
-    // })
-    // newPost.save().then(()=>{
-    //     console.log("new post saved")
-    // })
-    // res.json(newPost).status(200)
+    const newPost= new Post({
+        title:'몽고',
+        content:'디비디비',
+        image:'x',
+        userId:'60d4259b4751682e7e973021',
+        sara:1,
+        comment:{
+            like:1,
+            userId:'60d4254dec6bbb2e33526cfb'
+        }
+    })
+    newPost.save().then(()=>{
+        console.log("new post saved")
+    })
+    res.json(newPost).status(200)
     
     
     //🖍 수정하기 🖍

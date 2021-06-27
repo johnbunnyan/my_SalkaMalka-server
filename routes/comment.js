@@ -4,7 +4,7 @@ const commentController = require('../controllers/commentController')
 
 
 router.post('/', commentController.newCommentController)
-router.post('/{commentId}/like', commentController.likeCommentController)
-router.delete('/{commentId}', commentController.deleteCommentController)
+router.put('/:commentId/like', commentController.likeCommentController)
+router.patch('/:commentId', commentController.deleteCommentController)
 
 module.exports = router;

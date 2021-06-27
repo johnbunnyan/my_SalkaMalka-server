@@ -12,14 +12,12 @@ module.exports = {
 
     uploadController:async(req,res)=>{
  
-
+//console.log(req.body)
     const newPost= new Post({
         title:req.body.title,
         content:req.body.content,
         image:req.body.image,
         userId:req.body.userId,
-        isOpen:req.body.isOpen,
-        comment:req.body.comment
     })
     newPost.save().then(()=>{
         console.log("new post saved")
