@@ -8,7 +8,7 @@ const { generateAccessToken,
   checkRefreshToken,
 } = require('./tokenMethod');
 
-const User = require('../models/model');
+const { User } = require('../models/model');
 const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client('990259858397-e8j9lsf3a2h1276rt5f36m5cvmpi9imj.apps.googleusercontent.com')
 
@@ -61,7 +61,13 @@ module.exports = {
       res.status(409).send('이미 가입된 이메일이에요.');
     } else if (!userInfo) {
       const newUser = { email: req.body.email, password: req.body.password, provider: 'local' };
-      const insertMe = await User.insertOne(newUser);
+      const insertMe = await new User(newUser)
+      .save()
+      .then(res => res)
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send('err');
+      });
 
       if (insertMe.insertedCount === 0) {
         console.log('insert err');
