@@ -12,6 +12,8 @@ const User = require('../models/model');
 const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client('990259858397-e8j9lsf3a2h1276rt5f36m5cvmpi9imj.apps.googleusercontent.com')
 
+const axios = require('axios');
+
 module.exports = {
   signInController: async (req, res) => {
     const query = { email: req.body.email, password: req.body.password, provider: 'local' };
@@ -126,23 +128,24 @@ module.exports = {
         res.status(401).send('토큰이 유효하지 않아요.');
       }
       console.log('email', email);
-      const query = { email: req.body.email, provider: 'google' };
+      const query = { email: email, provider: 'google' };
       const googleUserInfo = await User.findOne(query);
 
       // 동일 유저를 찾을 수 없어 새로운 유저 생성
       if (!googleUserInfo) {
         console.log('you are new')
-        const newUser = { email: req.body.email, password: 'defaultgooglepassword', provider: 'google' };
-        const insertMe = new User(newUser)
+        const newUser = { email: query.email, password: 'defaultgooglepassword', provider: 'google' };
+        const insertMe = await new User(newUser)
         .save()
         .then(res => res)
         .catch((err) => {
           console.log(err);
           res.status(500).send('err');
         });
-        console.log(res)
-        const { email, provider } = res;
-        const userId = res._id;
+
+        console.log(insertMe);
+        const { email, provider } = insertMe;
+        const userId = insertMe._id;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
         const issueDate = new Date();
@@ -178,49 +181,69 @@ module.exports = {
   },
 
   kakaoSignInController: async (req, res) => {
-    const kakaoToken = isAuthorized(req);
+    const authorization = req.headers["Authorization"] || req.headers["authorization"] || req.body.headers.Authorization;
 
-    if (!kakaoToken) {
+    console.log(authorization)
+
+    if (!authorization) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else {
-      const query = { email: req.body.email, provider: 'kakao' };
+      const token = authorization.split(" ")[1];
+      const email = await axios
+      .post('https://kapi.kakao.com/v2/user/me',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        }
+      })
+      .then(res => res.data.id)
+      .catch(err => console.log(err));
+      
+      const query = { email: email, provider: 'kakao' };
       const kakaoUserInfo = await User.findOne(query);
 
       // 동일 유저를 찾을 수 없어 새로운 유저 생성
       if (!kakaoUserInfo) {
-        const newUser = { email: req.body.email, password: '', provider: 'kakao' };
-        const insertMe = await User.insertOne(newUser);
-
-        if (insertMe.insertedCount === 0) {
-          console.log('insert err');
+        console.log('you are new')
+        const newUser = { email: query.email, password: 'defaultkakaopassword', provider: 'kakao' };
+        const insertMe = await new User(newUser)
+        .save()
+        .then(res => res)
+        .catch((err) => {
+          console.log(err);
           res.status(500).send('err');
-        } else {
-          console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
-          const { email, provider } = userInfo;
-          const userId = userInfo._id;
-          const accessToken = generateAccessToken({ userId, email, provider });
-          const refreshToken = generateRefreshToken({ userId, email, provider });
-          const issueDate = new Date();
-          const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
-          const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
+        });
 
-          res
-          .cookie('refreshToken', refreshToken, { httpOnly: true })
-          .status(201)
-          .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
-        }
-      }
-
-      // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
-      else if (kakaoUserInfo) {
-        const { email, provider } = userInfo;
-        const userId = userInfo._id;
+        console.log(insertMe)
+        const { email, provider } = insertMe;
+        const userId = insertMe._id;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
         const issueDate = new Date();
         const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
         const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
 
+        console.log('email', email, 'userId', userId)
+        res
+        .cookie('refreshToken', refreshToken, { httpOnly: true })
+        .status(201)
+        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+      }
+
+      // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
+      else if (kakaoUserInfo) {
+        console.log('you exist')
+        const { email, provider } = kakaoUserInfo;
+        const userId = kakaoUserInfo._id;
+        const accessToken = generateAccessToken({ userId, email, provider });
+        const refreshToken = generateRefreshToken({ userId, email, provider });
+        const issueDate = new Date();
+        const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
+        const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
+        
+        console.log('user', kakaoUserInfo)
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)
