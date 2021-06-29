@@ -7,7 +7,6 @@ const mainController =require('./controllers/mainController');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const postRouter = require('./routes/post');
-const commentRouter = require('./routes/comment');
 
 require("dotenv").config();
 const {User} = require('./models/model')
@@ -16,11 +15,19 @@ const {Post} = require('./models/model')
 const app = express();
 const port = process.env.PORT || 5000;
 
+const myLogger = function (req, res, next) {
+    console.log(`request: ${req.method}, path: ${req.path}`); // 이 부분을 req, res 객체를 이용해 고치면, 여러분들은 모든 요청에 대한 로그를 찍을 수 있습니다.
+    next();
+  };
+  
+app.use(myLogger);
+  
+
 app.use(express.json()); //req.body 접근하게 해주는 미들웨어
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({
   origin: 'http://localhost:3000',
-  methods: ['GET, POST, OPTIONS, PUT, DELETE'],
+  methods: ['GET, POST, OPTIONS, PATCH, DELETE'],
   credentials: true
 }));
 
@@ -40,8 +47,8 @@ mongoose.connect(process.env.SRV, {
 
 
 app.use('/auth', authRouter);
-app.use('/user', userRouter);
-app.use('/post', postRouter);
+app.use('/users', userRouter);
+app.use('/posts', postRouter);
 app.use('/comment', commentRouter);
 
 app.get('/main',mainController.mainController)

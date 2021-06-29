@@ -77,4 +77,8 @@ const PostSchema = new schema({
 // })
 const User = mongoose.model("User",UserSchema)
 const Post = mongoose.model("Post", PostSchema)
+<<<<<<< HEAD
 module.exports = {User,Post}
+=======
+module.exports = { User, Post }
+>>>>>>> 064c9598077f17637a01d27ada67e3f8d05ceaf9

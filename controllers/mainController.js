@@ -1,8 +1,8 @@
 /* option 
 require("dotenv").config();
 */
-  
-const { User, Post } = require('../models/model');
+
+const { Post } = require('../models/model');
 
 module.exports = {
   mainController: async (req, res) => {
@@ -10,25 +10,24 @@ module.exports = {
 
     switch (sort) {
       case 'date':
-        const orderByDate = await Post.find({}, { sort: { _id: 1 } }).pretty();
-        // {
-        //   _id, // postId
-        //   userId
-        //   title,
-        //   image,
-        //   content,
-        //   isOpen,
-        //   comment: [
-        //     {
-        //       _id,
-        //       type,
-        //       like,
-        //       content,
-        //       userId: { $ref, $id, $db }
-        //     }
-        //   ]
-        // }
-
+        const query = {
+          $project:
+            {
+              image: 1,
+              isOpen: 1,
+              sara: 1,
+              mara: 1,
+              ratio: 1,
+              title: 1,
+              content: 1,
+              userId: 1,
+              comment: 1,
+              createdAt: 1,
+              updatedAt: 1
+            }
+        }
+        const sort = { $sort: { createdAt: -1 } };
+        const orderByDate = await Post.aggregate([query, sort]);
         if (orderByDate) {
           res.status(200).send(orderByDate);
         } else {
@@ -38,9 +37,25 @@ module.exports = {
         break;
 
       case 'popular':
-        const query = { $group: { _id: '$_id', commentCount: { $comment: { $sum: 1 } } } };
-        const sort = { $sort: { commentCount: -1 } };
-        const orderByPopular = await Post.aggregate([ query, sort ]);
+        const query1 = {
+          $project:
+            {
+              image: 1,
+              isOpen: 1,
+              sara: 1,
+              mara: 1,
+              ratio: 1,
+              title: 1,
+              content: 1,
+              userId: 1,
+              comment: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              commentCount: { $add: [ "$sara", "$mara" ] }
+            }
+        };
+        const sort1 = { $sort: { commentCount: -1 } };
+        const orderByPopular = await Post.aggregate([query1, sort1]);
 
         if (orderByPopular) {
           res.status(200).send(orderByPopular);
@@ -50,8 +65,25 @@ module.exports = {
 
         break;
 
-      case 'hotTopic':
-        const orderByHotTopic = await Post.find({}, { sort: { _id: 1 } }).pretty();
+      case 'hot-topic':
+        const query2 = {
+          $project:
+            {
+              image: 1,
+              isOpen: 1,
+              sara: 1,
+              mara: 1,
+              ratio: 1,
+              title: 1,
+              content: 1,
+              userId: 1,
+              comment: 1,
+              createdAt: 1,
+              updatedAt: 1
+            }
+        };
+        const sort2 = { $sort: { ratio: 1 } };
+        const orderByHotTopic = await Post.aggregate([query2, sort2]);
 
         if (orderByHotTopic) {
           res.status(200).send(orderByHotTopic);
@@ -62,18 +94,18 @@ module.exports = {
         break;
 
       default:
-        res.status(404).send();
-
+        res.sendStatus(404);
+        
         break;
     } 
   },
 
   searchController: async (req, res) => {
-    const queryString = req.query.q;
-    const searchResult = await Post.find({ title: /${queryString}/ }).pretty();
+    const queryString = new RegExp(decodeURI(decodeURIComponent(req.query.q)));
+    const searchResult = await Post.findOne({ title: queryString });
 
     if (searchResult) {
-      res.status(200).send(searchController);
+      res.status(200).send(searchResult);
     } else {
       res.status(500).send(err);
     }
