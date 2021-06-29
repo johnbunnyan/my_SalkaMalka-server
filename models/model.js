@@ -15,8 +15,16 @@ password:{
 },
 provider:{
     type:String,
-    default:'기본 이용자'
-}
+    default:'local'
+},
+bookmark:{
+    type:Array,
+    default:[]
+},
+point:{
+    type:Number,
+    default:0
+},
 },{timestamps:true}
 )
 
@@ -28,10 +36,24 @@ const CommentSchema = new schema({
     },
     content:{
         type:String,
-        required:true,
+        //required:true,
         default:'no comment'
     },
-    userId:{type:schema.Types.ObjectId, ref:'User', required:true}
+    type:{
+        type:String,
+        //required:true,
+        default:''
+    },
+    userId:{type:schema.Types.ObjectId, ref:'User', required:true},
+
+    isJudgement:{
+        type:Boolean,
+        default:false
+    },
+    isBest:{
+        type:Boolean,
+        default:false
+    },
 
 },{timestamps:true})
 
@@ -74,12 +96,13 @@ const PostSchema = new schema({
     type:Number,
     default:0
     },
-//사라마라 상황에따라 변동이 많은데 그걸 굳이 데이터화하는것은 투머치
-    // ratio:{
-    // type:Number,
-    // required:true,
-    // default:0
-    // },
+
+    ratio:{
+    type:Number,
+    required:true,
+    setDefaultsOnInsert:true,
+    default:0
+    },
     
         
 //comment컨트롤러에서 추가!!

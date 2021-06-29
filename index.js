@@ -38,7 +38,7 @@ mongoose.connect(process.env.SRV, {
 
 
 
-
+app.use('/uploads', express.static('uploads'))
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
 app.use('/post', postRouter);
@@ -90,21 +90,21 @@ app.use('/', (req,res,next)=>{
     //이따가는 new Post()의 인자로 req.body주면 됨
     
     
-    const newPost= new Post({
-        title:'몽고',
-        content:'디비디비',
-        image:'x',
-        userId:'60d4259b4751682e7e973021',
-        sara:1,
-        comment:{
-            like:1,
-            userId:'60d4254dec6bbb2e33526cfb'
-        }
-    })
-    newPost.save().then(()=>{
-        console.log("new post saved")
-    })
-    res.json(newPost).status(200)
+    // const newPost= new Post({
+    //     title:'몽고',
+    //     content:'디비디비',
+    //     image:'x',
+    //     userId:'60d4259b4751682e7e973021',
+    //     sara:1,
+    //     comment:{
+    //         like:1,
+    //         userId:'60d4254dec6bbb2e33526cfb'
+    //     }
+    // })
+    // newPost.save().then(()=>{
+    //     console.log("new post saved")
+    // })
+    // res.json(newPost).status(200)
     
     
     //🖍 수정하기 🖍
@@ -128,7 +128,7 @@ app.use('/', (req,res,next)=>{
     
     //👀 조회하기 👀
     //User.find().then((users)=>res.json(users).status(200))
-    //Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
+    Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
     
     /////////////////////////////
     

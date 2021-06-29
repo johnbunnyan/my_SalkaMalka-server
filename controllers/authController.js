@@ -8,7 +8,7 @@ const { generateAccessToken,
   checkRefreshToken 
 } = require('./tokenMethod');
 
-const User = require('../models/model');
+const {User} = require('../models/model');
 
 module.exports = {
   signInController: async (req, res) => {
@@ -59,14 +59,16 @@ module.exports = {
       res.status(409).send('이미 가입된 이메일이에요.');
     } else if (!userInfo) {
       const newUser = { email: req.body.email, password: req.body.password, provider: 'local' };
-      const result = await User.insertOne(newUser);
-
+      // const result = await User.insertOne(newUser);
+      const result = await User.create(newUser);
+      console.log(result) //insertedCount는 어떻게 나오는 건가?
       if (result.insertedCount === 0) {
         console.log('insert err');
         res.status(500).send('err');
       } else {
         console.log(`Insert count: ${result.insertedCount}, _id: ${result.insertedId}`);
-        res.status(201).send('살까말까에 오신 것을 환영합니다.');
+        //res.status(201).send('살까말까에 오신 것을 환영합니다.');
+        res.status(201).send(result);
       }
     }
   },

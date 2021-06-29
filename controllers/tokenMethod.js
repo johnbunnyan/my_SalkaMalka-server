@@ -24,6 +24,7 @@ module.exports = {
     },
     checkRefreshToken: (req) => {
       // const refreshToken = req.cookies.refreshToken;
+      //console.log(req)
       const refreshToken = req.headers.cookie.slice(13);
 
       if (!refreshToken) {
