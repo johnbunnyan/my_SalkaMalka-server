@@ -22,24 +22,24 @@ newCommentController:async(req,res)=>{
 
 
         let isOpen=null
-        await Post.findById(req.body.postId)
+        await Post.findById(req.params.postId)
         .then((open)=>{console.log(open.isOpen); isOpen=open.isOpen})
         console.log(isOpen)
         
         if(isOpen === true){
             //사라나 마라는 무조건 있어야한다.
             //console.log("wwwwwww")
-        if(req.body.sara ||req.body.mara){
+        if(req.body.type === 'sara'||req.body.type === 'mara'){
           //1. 코멘트 콘텐트가 있으면 배열에 넣는다
             if(req.body.content){
-                 Post.findById(req.body.postId)
+                 Post.findById(req.params.postId)
                 .then((doc)=>{
-                    console.log(req.body.mara)
+                    console.log(req.body.type)
                     doc.comment.push(
                     {
                  content:req.body.content,
                 userId:req.body.userId,
-                type:req.body.sara ||req.body.mara
+                type:req.body.type
                 }
                 )
                 doc.save()
@@ -51,9 +51,9 @@ newCommentController:async(req,res)=>{
         }
         
          //2. 사라마라 요청마다 1씩 더한다
-        if(req.body.sara && req.body.mara===undefined){
+        if(req.body.type === 'sara'){
             //sara카운트 올리기(update)
-            Post.findByIdAndUpdate(req.body.postId,{$inc:{sara:1}},{
+            Post.findByIdAndUpdate(req.params.postId,{$inc:{sara:1}},{
                 new:true,
                 //runValidators:true
             })
@@ -82,7 +82,7 @@ newCommentController:async(req,res)=>{
 
 
                 //코멭츠를 뽑아내는 기준(현재 포스트아이디)
-            Post.findById(req.body.postId)
+            Post.findById(req.params.postId)
             .then((result)=>{
             console.log(result)
             let ratiocal=function(){
@@ -93,8 +93,8 @@ newCommentController:async(req,res)=>{
             }
             let ratio=ratiocal()
             console.log(ratio)
-            console.log(req.body.postId)
-            const update = Post.updateOne({_id:req.body.postId},{
+            console.log(req.params.postId)
+            const update = Post.updateOne({_id:req.params.postId},{
                 ratio:ratio
             }).then((update)=> res.json({comments:result.comment}).status(201))
     
@@ -107,16 +107,16 @@ newCommentController:async(req,res)=>{
                 res.status(404).send("삭제된 살까말까에요!")})
         
         }
-        else if(req.body.mara&& req.body.sara===undefined){
+        else if(req.body.type==='mara'){
             //mara카운트 올리기(update)
-            Post.findByIdAndUpdate(req.body.postId,{$inc:{mara:1}},{
+            Post.findByIdAndUpdate(req.params.postId,{$inc:{mara:1}},{
                 new:true,
                 //runValidators:true
             })
             .then(()=>{
                 console.log("마라를 등록했어요!")
        //코멭츠를 뽑아내는 기준(현재 포스트아이디)
-       Post.findById(req.body.postId)
+       Post.findById(req.params.postId)
        .then((result)=>{
        console.log(result)
        let ratiocal=function(){
@@ -124,8 +124,8 @@ newCommentController:async(req,res)=>{
        }
        let ratio=ratiocal()
        console.log(ratio)
-       console.log(req.body.postId)
-       const update = Post.updateOne({_id:req.body.postId},{
+       console.log(req.params.postId)
+       const update = Post.updateOne({_id:req.params.postId},{
            ratio:ratio
        }).then((update)=> res.json({comments:result.comment}).status(201))
 
@@ -167,13 +167,13 @@ likeCommentController:async(req,res)=>{
 
 try {
     let isOpen=null
-    await Post.findById(req.body.postId)
+    await Post.findById(req.params.postId)
     .then((open)=>{console.log(open.isOpen); isOpen=open.isOpen})
     console.log(isOpen)
     
     if(isOpen === true){
         Post.updateOne({
-            "_id": req.body.postId, //this is level O select
+            "_id": req.params.postId, //this is level O select
             "comment": {
                 "$elemMatch": {
                     "_id": req.params.commentId, //this is level one select
@@ -225,7 +225,7 @@ try {
         const accessTokenData = isAuthorized(req)
 
         if(accessTokenData){
-            Post.findById(req.body.postId)
+            Post.findById(req.params.postId)
             .then((doc)=>{
                         console.log(doc)
                         doc.comment.pull(req.params.commentId)

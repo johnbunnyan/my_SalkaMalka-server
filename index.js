@@ -42,12 +42,6 @@ mongoose.connect(process.env.SRV, {
     console.log(err)
 })
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> commentControl
-
 app.use('/uploads', express.static('uploads'))
 app.use('/auth', authRouter);
 app.use('/users', userRouter);

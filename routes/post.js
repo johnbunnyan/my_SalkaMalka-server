@@ -48,13 +48,13 @@ const fs = require('fs')
 
 
 
-router.post('/', postController.seePostController)
-router.get('/{postId}',upload.single('image'), postController.uploadController)
-router.delete('/{postId}', postController.deletePostController)
-router.patch('/{postId}', postController.closePostController)
-router.post('/{postId}/comments', commentController.newCommentController)
-router.patch('/{postId}/comments/{commentId}', commentController.likeCommentController)
-router.delete('/{postId}/comments/{commentId}', commentController.deleteCommentController)
+router.post('/', upload.single('image'), postController.uploadController)
+router.get('/:postId',postController.seePostController)
+router.delete('/:postId', postController.deletePostController)
+router.patch('/:postId', postController.closePostController)
+router.post('/:postId/comments', commentController.newCommentController)
+router.patch('/:postId/comments/:commentId', commentController.likeCommentController)
+router.delete('/:postId/comments/:commentId', commentController.deleteCommentController)
 
 
  
