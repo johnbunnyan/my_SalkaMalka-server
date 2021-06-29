@@ -1,6 +1,4 @@
-/* option 
 require("dotenv").config();
-*/
 
 const { generateAccessToken, 
   generateRefreshToken,
@@ -9,16 +7,18 @@ const { generateAccessToken,
 } = require('./tokenMethod');
 
 const { User } = require('../models/model');
-const { OAuth2Client } = require('google-auth-library')
-const client = new OAuth2Client('990259858397-e8j9lsf3a2h1276rt5f36m5cvmpi9imj.apps.googleusercontent.com')
-
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_AUTH_CODE);
 const axios = require('axios');
 
 module.exports = {
   signInController: async (req, res) => {
+    console.log(req.body)
     const query = { email: req.body.email, password: req.body.password, provider: 'local' };
+    console.log(query);
     const userInfo = await User.findOne(query);
     // { _id: _id, email: email, password: password, provider: provider }
+    console.log(userInfo);
 
     if (!userInfo) {
       res.status(404).send('이메일 및 비밀번호를 확인해 주세요.');
@@ -42,7 +42,7 @@ module.exports = {
 
   signOutController: async (req, res) => {
     const accessTokenData = isAuthorized(req);
-
+    console.log(accessTokenData);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -69,11 +69,11 @@ module.exports = {
         res.status(500).send('err');
       });
 
-      if (insertMe.insertedCount === 0) {
+      if (!insertMe) {
         console.log('insert err');
         res.status(500).send('err');
       } else {
-        console.log(`Insert count: ${insertMe.insertedCount}, _id: ${insertMe.insertedId}`);
+        console.log(insertMe);
         res.status(201).send('살까말까에 오신 것을 환영합니다.');
       }
     }
@@ -85,8 +85,8 @@ module.exports = {
     if (!refreshTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (refreshTokenData) {
-      const { userId } = refreshTokenData;
-      const userInfo = await User.findOne({ userId });
+      const { userId, provider } = refreshTokenData;
+      const userInfo = await User.findOne({ _id: userId, provider });
       
       if (!userInfo) {
         res.status(500).send('err');
@@ -125,7 +125,7 @@ module.exports = {
       try {
         const ticket = await client.verifyIdToken({
           idToken: token,
-          audience: '990259858397-e8j9lsf3a2h1276rt5f36m5cvmpi9imj.apps.googleusercontent.com'
+          audience: process.env.GOOGLE_AUTH_CODE
         })
     
         email = ticket.getPayload().email;
@@ -204,9 +204,9 @@ module.exports = {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
         }
       })
-      .then(res => res.data.id)
+      .then(res => res.data.id + '@SalkaMalka.com')
       .catch(err => console.log(err));
-      
+
       const query = { email: email, provider: 'kakao' };
       const kakaoUserInfo = await User.findOne(query);
 
