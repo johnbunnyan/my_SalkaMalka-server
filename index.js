@@ -42,7 +42,13 @@ mongoose.connect(process.env.SRV, {
     console.log(err)
 })
 
+<<<<<<< HEAD
+=======
 
+
+>>>>>>> commentControl
+
+app.use('/uploads', express.static('uploads'))
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/posts', postRouter);
@@ -58,14 +64,36 @@ app.get('/search',mainController.searchController)
 app.use('/', (req,res,next)=>{
 
     
-    //🍀 User seeding(create) test////////////////
+    // //🍀 User seeding(create) test////////////////
     // const newUser= new User({
-    //     email:"coco@codestates.com",
-    //     password:'55535'
+    //     email:"jenny@codestates.com",
+    //     password:'8888'
     // })
     // newUser.save().then(()=>{
     //     console.log("new user saved")
-    //})
+    // })
+
+     //🍀 post.comment seeding(create) test////////////////
+     //console.log(Post)
+     
+//      Post.findById('60d60036f605cd8c66a29aa2')
+//     .then((doc)=>{
+//         console.log(doc)
+//     doc.comment.push(
+//         {
+//     type:true,
+//     like:22,
+//      //content:"후회할 거야",
+//     userId:'60d5ddd7be68577ec8df630b'
+//     }
+//     )
+//     doc.save()
+//     })
+// .then((out)=>{
+//         console.log("new comment saved")
+//         res.json(out).status(200)
+//     })
+
     
     //🍀 Post seeding(create) test////////////////
     // console.log(Post)
@@ -77,8 +105,8 @@ app.use('/', (req,res,next)=>{
     //     content:'디비디비',
     //     image:'x',
     //     userId:'60d4259b4751682e7e973021',
+    //     sara:1,
     //     comment:{
-    //         type:false,
     //         like:1,
     //         userId:'60d4254dec6bbb2e33526cfb'
     //     }
@@ -110,7 +138,7 @@ app.use('/', (req,res,next)=>{
     
     //👀 조회하기 👀
     //User.find().then((users)=>res.json(users).status(200))
-    //Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
+    Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
     
     /////////////////////////////
     
