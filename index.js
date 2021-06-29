@@ -42,14 +42,11 @@ mongoose.connect(process.env.SRV, {
     console.log(err)
 })
 
-//🔴몽고DB사용법은 userController에서 설명드렸습니다.
-
-
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/posts', postRouter);
-app.use('/comment', commentRouter);
+
 
 app.get('/main',mainController.mainController)
 //?sort={sort}
