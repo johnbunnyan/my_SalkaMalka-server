@@ -3,10 +3,10 @@ const { sign, verify } = require("jsonwebtoken");
 
 module.exports = {
     generateAccessToken: (data) => {
-      return sign(data, process.env.ACCESS_SECRET, { expiresIn: "3d" });
+      return sign(data, process.env.ACCESS_SECRET, { expiresIn: "3h" });
     },
     generateRefreshToken: (data) => {
-      return sign(data, process.env.REFRESH_SECRET, { expiresIn: "30d" });
+      return sign(data, process.env.REFRESH_SECRET, { expiresIn: "14d" });
     },
     isAuthorized: (req) => {
       const authorization = req.headers["Authorization"] || req.headers["authorization"] || req.body.headers.Authorization;
@@ -35,6 +35,6 @@ module.exports = {
       } catch (err) {
         return null;
       }
-    },
+    }
   };
   
