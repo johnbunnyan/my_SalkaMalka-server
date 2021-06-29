@@ -28,28 +28,52 @@ module.exports = {
   myCommentsController: async (req, res) => {
     console.log('my comments');
     const accessTokenData = isAuthorized(req);
+
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
       const { userId } = accessTokenData;
+      // const userId = req.path.split('/')[1];
+      console.log(userId)
       // needs testing
-      const myComments = await Post.find({
-        "comment.userId": ObjectId(userId)
-      })
-      .select({
-        '_id': 0,
-        'comment._id': 1,
+      let myComments = [];
+
+      function addComments(json) {
+        let comments = json.comment;
+        let postId = json._id;
+
+        comments.forEach(comment => {
+          comment.postId = postId;
+          comment.commentId = comment._id;
+          delete comment._id;
+        });
+
+        myComments = [...myComments, ...comments];
+      }
+
+      const query = { "comment.userId": ObjectId(userId) };
+      const project = {
         'comment.userId': 1,
         'comment.type': 1,
         'comment.like': 1,
-        'comment.content': 1
-      });
-
-      if (myComments) {
-        res.status(200).send(myComments);
-      } else {
-        res.status(500).send('err');
+        'comment.content': 1,
+        'comment._id': 1
       }
+
+      Post.aggregate([{$match: query}, {$project: project}])
+      .cursor().exec()
+      .on('data', function(doc) {
+        let str = JSON.stringify(doc);
+        let json = JSON.parse(str);
+        addComments(json);
+      })
+      .on('end', function() {
+        if (myComments) {
+          res.status(200).send(myComments);
+        } else {
+          res.status(500).send('err');
+        }
+      })
     } else {
       res.status(500).send('err');
     }
