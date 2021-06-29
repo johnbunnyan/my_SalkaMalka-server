@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
-
-
 const UserSchema = new schema({
 email:{
     type:String,
@@ -19,7 +17,6 @@ provider:{
 }
 },{timestamps:true}
 )
-
 
 const CommentSchema = new schema({
     type:{
@@ -70,4 +67,4 @@ const PostSchema = new schema({
 // })
 const User = mongoose.model("User",UserSchema)
 const Post = mongoose.model("Post", PostSchema)
-module.exports = User, Post
+module.exports = { User, Post }

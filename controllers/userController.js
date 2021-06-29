@@ -2,27 +2,157 @@
 require("dotenv").config();
 */
 
-//mongoDB 이용하는 법
-
-//model에서 쓸 컬렉션을 가져옵니다
-const User = require('../models/model')
-//User. ~~을 누르면 해당 컬렉션으로 조회나 입력등 작업을 하실 수 있습니다.
-
+const { isAuthorized } = require('./tokenMethod');
+const ObjectId = require('mongoose').Types.ObjectId; 
+const { User, Post } = require('../models/model');
 
 module.exports = {
+  myPostsController: async (req, res) => {
+    const accessTokenData = isAuthorized(req);
+    if (!accessTokenData) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else if (accessTokenData) {
+      const { userId } = accessTokenData;
+      const myPosts = await Post.find().where('userId').equals(userId);
 
+      if (myPosts) {
+        res.status(200).send(myPosts);
+      } else {
+        res.status(500).send('err');
+      }
+    } else {
+      res.status(500).send('err');
+    }
+  },
+  
+  myCommentsController: async (req, res) => {
+    console.log('my comments');
+    const accessTokenData = isAuthorized(req);
+    if (!accessTokenData) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else if (accessTokenData) {
+      const { userId } = accessTokenData;
+      // needs testing
+      const myComments = await Post.find({
+        "comment.userId": ObjectId(userId)
+      })
+      .select({
+        '_id': 0,
+        'comment._id': 1,
+        'comment.userId': 1,
+        'comment.type': 1,
+        'comment.like': 1,
+        'comment.content': 1
+      });
 
-myPostsController:async(req,res)=>{
+      if (myComments) {
+        res.status(200).send(myComments);
+      } else {
+        res.status(500).send('err');
+      }
+    } else {
+      res.status(500).send('err');
+    }
+  },
 
+  deleteMeController: async (req, res) => {
+    console.log('delete me')
+    const accessTokenData = isAuthorized(req);
+    if (!accessTokenData) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else if (accessTokenData) {
+      const { userId, provider } = accessTokenData;
+      const deleteMe = await User.deleteOne({ _id: userId, provider });
 
-},
-myCommentsController:async(req,res)=>{
+      if (deleteMe.deletedCount === 0) {
+        console.log('delete err');
+        res.status(500).send('err');
+      } else {
+        console.log(`Delete count: ${deleteMe.deletedCount}`)
+        res.sendStatus(204);
+      }
+    } else {
+      res.status(500).send('err');
+    }
+  },
 
+  myBookmarksController: async (req, res) => {
+    const accessTokenData = isAuthorized(req);
+    if (!accessTokenData) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else if (accessTokenData) {
+      const { userId, provider } = accessTokenData;
+      const userQuery = { _id: userId, provider };
+      const user = await User.findOne(userQuery);
+      const myBookmarks = await Post.find()
 
-},
-deleteMeController:async(req,res)=>{
+      if (myBookmarks) {
+        res.status(200).send(myBookmarks);
+      } else {
+        res.status(500).send('err');
+      }
+    } else {
+      res.status(500).send('err');
+    }
+  },
 
+  addBookmarkController: async (req, res) => {
+    const accessTokenData = isAuthorized(req);
+    if (!accessTokenData) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else if (accessTokenData) {
+      const { postId } = req.body;
+      const postQuery = { _id: postId }
+      const postToAdd = await Post.findOne(postQuery);
 
-},
+      if (!postToAdd) {
+        res.status(404).send('삭제된 살까말까에요!');
+      } else {
+        const { userId, provider } = accessTokenData;
+        const userQuery = { _id: userId, provider };
+        const user = await User.findOne(userQuery);
+        const beforelength = user.bookmarks.length;
+        user.bookmarks.push(postId).save();
+        const afterlength = user.bookmarks.length;
+        
+        if (afterlength !== beforelength) {
+          res.status(201).send('책갈피를 추가했어요.');
+        } else {
+          res.status(500).send('err');
+        }
+      }
+    } else {
+      res.status(500).send('err');
+    }
+  },
 
+  deleteBookmarkController: async (req, res) => {
+    const accessTokenData = isAuthorized(req);
+    if (!accessTokenData) {
+      res.status(401).send('토큰이 유효하지 않아요.');
+    } else if (accessTokenData) {
+      const postId = req.query.postId;
+      const postQuery = { _id: postId };
+      const postToDelete = await Post.findOne(postQuery);
+
+      if (!postToDelete) {
+        res.status(404).send('삭제된 살까말까에요!');
+      } else {
+        const { userId, provider } = accessTokenData;
+        const userQuery = { _id: userId, provider };
+        const user = await User.findOne(userQuery);
+        const beforelength = user.bookmarks.length;
+        user.bookmarks.splice(user.bookmarks.indexOf(postId) , 1).save();
+        const afterlength = user.bookmarks.length;
+
+        if (afterlength !== beforelength) {
+          res.status(201).send('책갈피를 추가했어요.');
+        } else {
+          res.status(500).send('err');
+        }
+      }
+    } else {
+      res.status(500).send('err');
+    }
+  }
 }
