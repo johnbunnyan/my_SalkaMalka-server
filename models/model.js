@@ -16,10 +16,7 @@ provider:{
     type:String,
     default:'local'
 },
-bookmark:{
-    type:Array,
-    default:[]
-},
+bookmarks:[{ type: schema.Types.ObjectId, ref: 'Post' }],
 point:{
     type:Number,
     default:0

@@ -132,7 +132,7 @@ app.use('/', (req,res,next)=>{
     
     //👀 조회하기 👀
     //User.find().then((users)=>res.json(users).status(200))
-    Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
+    //Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
     
     /////////////////////////////
     

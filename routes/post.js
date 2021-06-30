@@ -3,13 +3,6 @@ const router = express.Router();
 const postController = require('../controllers/postController')
 const commentController = require('../controllers/commentController')
 
-// router.post('', postController.uploadController)
-// router.get('/:postId',postController.seePostController)
-// router.delete('/:postId', postController.deletePostController)
-// router.put('/:postId/close', postController.closePostController)
-//🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-
 
 //이미지 관련 모듈 
 const multer = require("multer");
