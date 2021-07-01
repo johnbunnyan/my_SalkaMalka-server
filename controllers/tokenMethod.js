@@ -8,8 +8,9 @@ module.exports = {
     generateRefreshToken: (data) => {
       return sign(data, process.env.REFRESH_SECRET, { expiresIn: "14d" });
     },
-    isAuthorized: (req) => {
-      const authorization = req.headers["Authorization"] || req.headers["authorization"] || req.body.headers.Authorization;
+    isAuthorized: (req,res) => {
+   
+      const authorization = req.headers["Authorization"] || req.headers["authorization"] 
 
       if (!authorization) {
         return null;
@@ -24,6 +25,7 @@ module.exports = {
     },
     checkRefreshToken: (req) => {
       // const refreshToken = req.cookies.refreshToken;
+      //console.log(req)
       const refreshToken = req.headers.cookie.slice(13);
 
       if (!refreshToken) {
