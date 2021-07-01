@@ -16,7 +16,7 @@ module.exports = {
       const myPosts = await Post.find().where('userId').equals(userId);
 
       if (myPosts) {
-        res.status(200).send(myPosts);
+        res.status(200).send({posts:myPosts});
       } else {
         res.status(500).send('err');
       }
@@ -72,7 +72,7 @@ module.exports = {
         myComments = myComments.filter(i => i.userId === userId)
 
         if (myComments) {
-          res.status(200).send(myComments);
+          res.status(200).send({comments:myComments});
         } else {
           res.status(500).send('err');
         }
@@ -115,7 +115,7 @@ module.exports = {
       const myBookmarks = user.bookmarks
 
       if (myBookmarks) {
-        res.status(200).send(myBookmarks);
+        res.status(200).send({bookmarks:myBookmarks});
       } else {
         res.status(500).send('err');
       }

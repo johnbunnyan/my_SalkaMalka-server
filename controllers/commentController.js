@@ -152,7 +152,8 @@ newCommentController:async(req,res)=>{
 
         
     } catch (error) {
-        res.status(500).send("err")  
+        //res.status(500).send("err")  
+        res.status(404).send("삭제된 살까말까에요!")
     }
 
 
@@ -178,6 +179,7 @@ try {
         //body의 userId를 like누르는 사람의 userId로 바꿔서 준다면
         //해당 코멘트 쓴 userId와 req로 들어온 userId 서로 비교해서 
         //같지 않을때만 실행되도록
+       
         Post.updateOne({
             "_id": req.params.postId, //this is level O select
             "comment": {
@@ -203,7 +205,12 @@ try {
             })
                     .then((out)=>{
                             console.log("like updated")
+                            console.log(out)
+                            if(out.nModified !== 0){
                             res.status(200).json("like")
+                            }else{
+                                res.status(500).send("삭제된 사라마라예요!")
+                            }
                         })
     
         .catch(error=>{console.log(error) 
