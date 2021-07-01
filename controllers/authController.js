@@ -41,6 +41,10 @@ module.exports = {
   },
 
   signOutController: async (req, res) => {
+
+    // res.clearCookie('refreshToken');
+    // res.status(200).send('다음에 또 찾아주세요.');
+    // return;
     const accessTokenData = isAuthorized(req);
     console.log(accessTokenData);
     if (!accessTokenData) {
@@ -121,6 +125,7 @@ module.exports = {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else {
       const token = authorization.split(" ")[1];
+      console.log(token);
       let email = ''
       try {
         const ticket = await client.verifyIdToken({
@@ -129,6 +134,7 @@ module.exports = {
         })
     
         email = ticket.getPayload().email;
+        console.log(email);
       } catch (err) {
         console.log(err);
         res.status(401).send('토큰이 유효하지 않아요.');
@@ -188,7 +194,8 @@ module.exports = {
 
   kakaoSignInController: async (req, res) => {
     const authorization = req.headers["Authorization"] || req.headers["authorization"] || req.body.headers.Authorization;
-
+    console.log(req.headers);
+    
     console.log(authorization)
 
     if (!authorization) {
@@ -209,7 +216,7 @@ module.exports = {
 
       const query = { email: email, provider: 'kakao' };
       const kakaoUserInfo = await User.findOne(query);
-
+      console.log(query);
       // 동일 유저를 찾을 수 없어 새로운 유저 생성
       if (!kakaoUserInfo) {
         console.log('you are new')

@@ -60,14 +60,15 @@ module.exports = {
         'comment._id': 1
       }
 
-      Post.aggregate([{$match: query}, {$project: project}])
-      .cursor().exec()
+      Post.find(query)
+      .cursor()
       .on('data', function(doc) {
         let str = JSON.stringify(doc);
         let json = JSON.parse(str);
         addComments(json);
       })
       .on('end', function() {
+        myComments = myComments.filter(i => i.userId === userId)
         if (myComments) {
           res.status(200).send(myComments);
         } else {
