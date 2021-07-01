@@ -8,7 +8,7 @@ const { User, Post } = require('../models/model');
 
 module.exports = {
   myPostsController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -27,7 +27,7 @@ module.exports = {
   
   myCommentsController: async (req, res) => {
     console.log('my comments');
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
 
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
@@ -82,7 +82,7 @@ module.exports = {
 
   deleteMeController: async (req, res) => {
     console.log('delete me')
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -102,7 +102,7 @@ module.exports = {
   },
 
   myBookmarksController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -123,7 +123,7 @@ module.exports = {
   },
 
   addBookmarkController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -155,7 +155,7 @@ module.exports = {
   },
 
   deleteBookmarkController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {

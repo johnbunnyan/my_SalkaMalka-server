@@ -34,7 +34,7 @@ console.log(req.file)
 console.log(req.body)
 
 
-        const accessTokenData = isAuthorized(req)
+        const accessTokenData = isAuthorized(req,res)
 
       
         if(accessTokenData){
@@ -91,7 +91,7 @@ console.log(req.params.postId)
 deletePostController:async(req,res)=>{
     //토큰 라우팅
 
-    const accessTokenData = isAuthorized(req)
+    const accessTokenData = isAuthorized(req,res)
 
         if(accessTokenData){
 
@@ -118,7 +118,7 @@ deletePostController:async(req,res)=>{
 closePostController:async(req,res)=>{
 //토큰 라우팅
 
-const accessTokenData = isAuthorized(req)
+const accessTokenData = isAuthorized(req,res)
 
 
 if(accessTokenData){

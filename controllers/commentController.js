@@ -222,7 +222,7 @@ try {
 
     //코멘트 달면 응답으로 해당 포스트아이디도 주는데 저장했다가 삭제할때 줄수 있나?
     deleteCommentController:async(req,res)=>{
-        const accessTokenData = isAuthorized(req)
+        const accessTokenData = isAuthorized(req,res)
 
         if(accessTokenData){
             Post.findById(req.params.postId)
