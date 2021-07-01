@@ -42,10 +42,8 @@ module.exports = {
 
   signOutController: async (req, res) => {
 
-    // res.clearCookie('refreshToken');
-    // res.status(200).send('다음에 또 찾아주세요.');
-    // return;
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
+
     console.log(accessTokenData);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
@@ -67,11 +65,7 @@ module.exports = {
       const newUser = { email: req.body.email, password: req.body.password, provider: 'local' };
       const insertMe = await new User(newUser)
       .save()
-      .then(res => res)
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send('err');
-      });
+     
 
       if (!insertMe) {
         console.log('insert err');

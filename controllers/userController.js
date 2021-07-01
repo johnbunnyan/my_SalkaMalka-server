@@ -1,14 +1,14 @@
 /* option 
 require("dotenv").config();
 */
-
+const mongoose = require("mongoose")
 const { isAuthorized } = require('./tokenMethod');
 const ObjectId = require('mongoose').Types.ObjectId; 
 const { User, Post } = require('../models/model');
 
 module.exports = {
   myPostsController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -27,7 +27,7 @@ module.exports = {
   
   myCommentsController: async (req, res) => {
     console.log('my comments');
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
 
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
@@ -68,7 +68,9 @@ module.exports = {
         addComments(json);
       })
       .on('end', function() {
+
         myComments = myComments.filter(i => i.userId === userId)
+
         if (myComments) {
           res.status(200).send(myComments);
         } else {
@@ -82,7 +84,7 @@ module.exports = {
 
   deleteMeController: async (req, res) => {
     console.log('delete me')
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -102,14 +104,15 @@ module.exports = {
   },
 
   myBookmarksController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
       const { userId, provider } = accessTokenData;
       const userQuery = { _id: userId, provider };
-      const user = await User.findOne(userQuery);
-      const myBookmarks = await Post.find()
+      const user = await User.findOne(userQuery).populate('bookmarks')
+      console.log(user)
+      const myBookmarks = user.bookmarks
 
       if (myBookmarks) {
         res.status(200).send(myBookmarks);
@@ -122,7 +125,7 @@ module.exports = {
   },
 
   addBookmarkController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -136,8 +139,10 @@ module.exports = {
         const { userId, provider } = accessTokenData;
         const userQuery = { _id: userId, provider };
         const user = await User.findOne(userQuery);
+        console.log(user)
         const beforelength = user.bookmarks.length;
-        user.bookmarks.push(postId).save();
+        user.bookmarks.push(postId)
+        user.save()
         const afterlength = user.bookmarks.length;
         
         if (afterlength !== beforelength) {
@@ -152,11 +157,11 @@ module.exports = {
   },
 
   deleteBookmarkController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
-      const postId = req.query.postId;
+      const postId = req.params.postId;
       const postQuery = { _id: postId };
       const postToDelete = await Post.findOne(postQuery);
 
@@ -167,11 +172,12 @@ module.exports = {
         const userQuery = { _id: userId, provider };
         const user = await User.findOne(userQuery);
         const beforelength = user.bookmarks.length;
-        user.bookmarks.splice(user.bookmarks.indexOf(postId) , 1).save();
+        user.bookmarks.splice(user.bookmarks.indexOf(postId) , 1)
+        user.save();
         const afterlength = user.bookmarks.length;
 
-        if (afterlength !== beforelength) {
-          res.status(201).send('책갈피를 추가했어요.');
+        if (afterlength !== beforelength || afterlength===0) {
+          res.status(201).send('책갈피를 삭제했어요.');
         } else {
           res.status(500).send('err');
         }
