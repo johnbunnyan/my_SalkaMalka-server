@@ -41,7 +41,7 @@ module.exports = {
   },
 
   signOutController: async (req, res) => {
-    const accessTokenData = isAuthorized(req);
+    const accessTokenData = isAuthorized(req,res);
     console.log(accessTokenData);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
