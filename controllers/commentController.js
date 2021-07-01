@@ -172,6 +172,12 @@ try {
     console.log(isOpen)
     
     if(isOpen === true){
+        //포스트가 열려있는데, 만약 해당 코멘트를 자신이 썼으면 작동안하도록은 가능!
+        //body의 userId는 코멘트를 쓴 사람->api문서에서의 정의하기로는
+        //해당 코멘트에 이미 그 코멘트를 쓴 userId가 있고
+        //body의 userId를 like누르는 사람의 userId로 바꿔서 준다면
+        //해당 코멘트 쓴 userId와 req로 들어온 userId 서로 비교해서 
+        //같지 않을때만 실행되도록
         Post.updateOne({
             "_id": req.params.postId, //this is level O select
             "comment": {
