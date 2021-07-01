@@ -29,7 +29,7 @@ module.exports = {
         const sort = { $sort: { createdAt: -1 } };
         const orderByDate = await Post.aggregate([query, sort]);
         if (orderByDate) {
-          res.status(200).send(orderByDate);
+          res.status(200).send({posts:orderByDate});
         } else {
          res.status(500).send(err);
         }
@@ -58,7 +58,7 @@ module.exports = {
         const orderByPopular = await Post.aggregate([query1, sort1]);
 
         if (orderByPopular) {
-          res.status(200).send(orderByPopular);
+          res.status(200).send({posts:orderByPopular});
         } else {
           res.status(500).send(err);
         }
@@ -86,7 +86,7 @@ module.exports = {
         const orderByHotTopic = await Post.aggregate([query2, sort2]);
 
         if (orderByHotTopic) {
-          res.status(200).send(orderByHotTopic);
+          res.status(200).send({posts:orderByHotTopic});
         } else {
           res.status(500).send(err);
         }
@@ -105,7 +105,7 @@ module.exports = {
     const searchResult = await Post.find({ title: queryString });
     console.log(searchResult)
     if (searchResult) {
-      res.status(200).send(searchResult);
+      res.status(200).send({posts:searchResult});
     } else {
       res.status(500).send('err');
     }

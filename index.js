@@ -135,7 +135,7 @@ app.use('/', (req,res,next)=>{
     //Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
     
     /////////////////////////////
-    
+    res.status(200).send("hello I'm server🧞, please request me with more endpoints🚥")
     
     });
 

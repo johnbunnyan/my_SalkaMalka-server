@@ -42,10 +42,10 @@ console.log(req.body)
             
             //console.log(req.body)
 
-  
+  if(req.file){
             const imgData=req.file.path
             console.log(imgData)
-
+  
                 const newPost= new Post({
                     title:req.body.title,
                     content:req.body.content,
@@ -60,13 +60,32 @@ console.log(req.body)
                 })
             .catch(error=>{console.log(error) 
             res.status(500).send("err")})
-        }else{
+        }
+        else if(!req.file){
+      
+  
+                const newPost= new Post({
+                    title:req.body.title,
+                    content:req.body.content,
+                    // image:imgData,
+                    userId:req.body.userId,
+                })
+                newPost.save().then(()=>{
+                    console.log("new post saved")
+                })
+                .then(()=>{
+                    res.json("새로운 살까말까를 등록했어요!").status(201)
+                })
+            .catch(error=>{console.log(error) 
+            res.status(500).send("err")})
+        }
+        else{
             res.status(401).json("토큰이 유효하지 않아요.") 
         }
 
 
 
-
+    }
 },
 
 
@@ -99,7 +118,7 @@ deletePostController:async(req,res)=>{
             console.log(req.headers.authorization.split(" ")[1])
             try{
                 Post.findByIdAndDelete(req.params.postId)
-                .then((posts)=> res.json("성공적으로 삭제했습니다.").status(200))
+                .then((posts)=> res.status(204).send())
                 
             }catch(e){
                     res.status(500).json("err")
@@ -128,7 +147,7 @@ if(accessTokenData){
             new:true,
             //runValidators:true
         })
-        .then((posts)=> res.json("더이상 사라마라를 받지 않아.").status(200))
+        .then((posts)=> res.json("더이상 사라마라를 받지 않아요.").status(200))
     }catch(e){
             res.status(401).json("토큰이 만료되었어요.")
     }
