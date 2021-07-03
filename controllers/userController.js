@@ -132,6 +132,8 @@ module.exports = {
       const { postId } = req.body;
       const postQuery = { _id: postId }
       const postToAdd = await Post.findOne(postQuery);
+      //console.log(postToAdd)
+      
 
       if (!postToAdd) {
         res.status(404).send('삭제된 살까말까에요!');
@@ -139,16 +141,29 @@ module.exports = {
         const { userId, provider } = accessTokenData;
         const userQuery = { _id: userId, provider };
         const user = await User.findOne(userQuery);
-        console.log(user)
         const beforelength = user.bookmarks.length;
-        user.bookmarks.push(postId)
-        user.save()
-        const afterlength = user.bookmarks.length;
-        
-        if (afterlength !== beforelength) {
-          res.status(201).send('책갈피를 추가했어요.');
-        } else {
-          res.status(500).send('err');
+        //console.log(user.bookmarks)
+      
+        let isexitst=[]
+        for(let i=0;i<user.bookmarks.length;i++){
+         if(user.bookmarks[i].toString() === postId)
+            isexitst.push(user.bookmarks[i])
+          
+        }
+        console.log(isexitst)
+        if(isexitst.length > 0){
+          res.status(409).send("이미 북마크에 있어요.")
+        }else{
+          user.bookmarks.push(postId)
+          user.save()
+          const afterlength = user.bookmarks.length;
+          
+          if (afterlength !== beforelength) {
+            res.status(201).send({message:'책갈피를 추가했어요.',value:isexitst});
+          } else {
+            res.status(500).send('err');
+          }
+
         }
       }
     } else {

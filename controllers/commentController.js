@@ -205,12 +205,36 @@ try {
             })
                     .then((out)=>{
                             console.log("like updated")
+                            
                             console.log(out)
-                            if(out.nModified !== 0){
-                            res.status(200).json("like")
-                            }else{
-                                res.status(500).send("삭제된 사라마라예요!")
+
+                            Post.findOne({
+                                "_id": req.params.postId, //this is level O select
+                                "comment": {
+                                    "$elemMatch": {
+                                        "_id": req.params.commentId, //this is level one select
+                                     
+                                    }
+                                }
+                            },
+                            {
+                            
+                                comment:{
+                                    $elemMatch:{
+                                        _id:req.params.commentId
+                                    },
+                                }
                             }
+                            
+                            )
+                            .then((liked)=>{console.log(liked.comment[0].like)
+                                if(out.nModified !== 0){
+                                res.status(200).json({"like":liked.comment[0].like})
+                                }else{
+                                    res.status(500).send("삭제된 사라마라예요!")
+                                }
+                            })
+
                         })
     
         .catch(error=>{console.log(error) 
