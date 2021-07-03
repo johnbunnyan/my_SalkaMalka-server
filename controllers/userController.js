@@ -159,7 +159,7 @@ module.exports = {
           const afterlength = user.bookmarks.length;
           
           if (afterlength !== beforelength) {
-            res.status(201).send({message:'책갈피를 추가했어요.',value:isexitst});
+            res.status(201).send('책갈피를 추가했어요.');
           } else {
             res.status(500).send('err');
           }
