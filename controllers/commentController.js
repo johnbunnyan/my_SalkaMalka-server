@@ -268,9 +268,14 @@ try {
                         doc.comment.pull(req.params.commentId)
                     
                     doc.save()
-                    }).then((out)=>{
-                        console.log("comment deleted")
-                        res.status(204).end()
+                    .then(()=>{
+                        Post.findById(req.params.postId)
+                        .then((doc)=>{
+                            console.log(doc)
+                            console.log("comment deleted")
+                            res.status(200).json({"comments":doc.comment})
+                        })
+                    })
                     })
 
 
