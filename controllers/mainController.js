@@ -101,11 +101,10 @@ module.exports = {
   },
 
   searchController: async (req, res) => {
-    const queryString = new RegExp(decodeURI(decodeURIComponent(req.query.q)));
-    const searchResult = await Post.find({ title: queryString });
-    console.log(searchResult)
+    const queryString = decodeURI(decodeURIComponent(req.query.q));
+    const searchResult = await Post.find({ title: { $regex: queryString } });
     if (searchResult) {
-      res.status(200).send({posts:searchResult});
+      res.status(200).send({ posts: searchResult });
     } else {
       res.status(500).send('err');
     }
