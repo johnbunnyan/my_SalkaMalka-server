@@ -141,16 +141,18 @@ const accessTokenData = isAuthorized(req,res)
 
 
 if(accessTokenData){
-    console.log(req.params.postId)
-    try{
         Post.findByIdAndUpdate(req.params.postId,{isOpen:false},{
             new:true,
             //runValidators:true
         })
-        .then((posts)=> res.json("더이상 사라마라를 받지 않아요.").status(200))
-    }catch(e){
-            res.status(401).json("토큰이 만료되었어요.")
-    }
+        .then((posts)=> {
+            if (posts) {
+                res.json("더이상 사라마라를 받지 않아요.").status(200)
+            } else {
+                res.status(404).json('삭제된 살까말까예요!');
+            }
+        })
+        .catch(e => console.log(e));
 
 }else{
     res.status(401).json("토큰이 유효하지 않아요.")

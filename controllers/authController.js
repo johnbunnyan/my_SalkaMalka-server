@@ -25,6 +25,7 @@ module.exports = {
     } else if (userInfo) {
       const { email, provider } = userInfo;
       const userId = userInfo._id;
+      const bookmarks = userInfo.bookmarks;
       const accessToken = generateAccessToken({ userId, email, provider });
       const refreshToken = generateRefreshToken({ userId, email, provider });
       const issueDate = new Date();
@@ -34,7 +35,7 @@ module.exports = {
       res
       .cookie('refreshToken', refreshToken, { httpOnly: true })
       .status(200)
-      .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+      .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate, bookmarks });
     } else {
       res.status(500).send('err');
     }
@@ -42,6 +43,9 @@ module.exports = {
 
   signOutController: async (req, res) => {
 
+    // res.clearCookie('refreshToken');
+    // res.status(200).send('다음에 또 찾아주세요.');
+    // return;
     const accessTokenData = isAuthorized(req,res);
 
     console.log(accessTokenData);
@@ -152,6 +156,7 @@ module.exports = {
         console.log(insertMe);
         const { email, provider } = insertMe;
         const userId = insertMe._id;
+        const bookmarks = insertMe.bookmarks;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
         const issueDate = new Date();
@@ -168,6 +173,7 @@ module.exports = {
         console.log('you exist')
         const { email, provider } = googleUserInfo;
         const userId = googleUserInfo._id;
+        const bookmarks = googleUserInfo.bookmarks;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
         const issueDate = new Date();
@@ -177,7 +183,7 @@ module.exports = {
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)
-        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+        .send({ userId, email, bookmarks, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
       }
       
       else {
@@ -226,6 +232,7 @@ module.exports = {
         console.log(insertMe)
         const { email, provider } = insertMe;
         const userId = insertMe._id;
+        const bookmarks = insertMe.bookmarks;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
         const issueDate = new Date();
@@ -236,7 +243,7 @@ module.exports = {
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(201)
-        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+        .send({ userId, email, bookmarks, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
       }
 
       // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
@@ -244,6 +251,7 @@ module.exports = {
         console.log('you exist')
         const { email, provider } = kakaoUserInfo;
         const userId = kakaoUserInfo._id;
+        const bookmarks = kakaoUserInfo.bookmarks;
         const accessToken = generateAccessToken({ userId, email, provider });
         const refreshToken = generateRefreshToken({ userId, email, provider });
         const issueDate = new Date();
@@ -254,7 +262,7 @@ module.exports = {
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)
-        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+        .send({ userId, email, bookmarks, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
       }
       
       else {
