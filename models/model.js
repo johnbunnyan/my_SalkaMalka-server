@@ -9,8 +9,7 @@ const UserSchema = new schema({
     unique:true
 },
 password:{
-    type:String,
-    unique:true
+    type:String
 },
 provider:{
     type:String,
