@@ -30,6 +30,7 @@ newCommentController:async(req,res)=>{
             //사라나 마라는 무조건 있어야한다.
             //console.log("wwwwwww")
         if(req.body.type === 'sara'||req.body.type === 'mara'){
+            
           //1. 코멘트 콘텐트가 있으면 배열에 넣는다
             if(req.body.content){
                  Post.findById(req.params.postId)
@@ -46,12 +47,8 @@ newCommentController:async(req,res)=>{
                 })
             .then((out)=>{
                     console.log("new comment saved")
-                })
-        
-        }
-        
-         //2. 사라마라 요청마다 1씩 더한다
-        if(req.body.type === 'sara'){
+                    //2. 사라마라 요청마다 1씩 더한다
+           if(req.body.type === 'sara'){
             //sara카운트 올리기(update)
             Post.findByIdAndUpdate(req.params.postId,{$inc:{sara:1}},{
                 new:true,
@@ -59,28 +56,9 @@ newCommentController:async(req,res)=>{
             })
             .then(()=>{
                 console.log("사라를 등록했어요!")
-
-
-                //ratio 계산
-                //마라랑 사라 값 가져오기
-                //둘이 계산
-                //ratio에 넣기
-                
-
-//  const post = await Post.updateMany({title:"구름빵"}, 
-//     {title:"구름빵",
-//     content:'구름처럼 생김',
-//         image:'x',
-//         userId:'60d42c224f9cf13167106903',
-//         comment:{
-//             type:false,
-//             like:7,
-//             userId:'60d4254dec6bbb2e33526cfb'
-//         }
-//     })
-    // .then((update)=>res.json(update).status(200))
-
-
+ 
+ 
+ 
                 //코멭츠를 뽑아내는 기준(현재 포스트아이디)
             Post.findById(req.params.postId)
             .then((result)=>{
@@ -100,8 +78,8 @@ newCommentController:async(req,res)=>{
     
            
                 })
-
-
+ 
+ 
             })
             .catch(error=>{console.log(error) 
                 res.status(404).send("삭제된 살까말까에요!")})
@@ -111,14 +89,14 @@ newCommentController:async(req,res)=>{
             //mara카운트 올리기(update)
             Post.findByIdAndUpdate(req.params.postId,{$inc:{mara:1}},{
                 new:true,
-                //runValidators:true
+                useFindAndModify:false
             })
             .then(()=>{
                 console.log("마라를 등록했어요!")
        //코멭츠를 뽑아내는 기준(현재 포스트아이디)
        Post.findById(req.params.postId)
        .then((result)=>{
-       console.log(result)
+       //console.log(result)
        let ratiocal=function(){
            return Math.abs(1-(result.sara - result.mara)*0.01)
        }
@@ -128,16 +106,114 @@ newCommentController:async(req,res)=>{
        const update = Post.updateOne({_id:req.params.postId},{
            ratio:ratio
        }).then((update)=> res.json({comments:result.comment}).status(201))
-
+ 
       
            })
-
-
+ 
+ 
                
             })
         .catch(error=>{console.log(error) 
         res.status(404).send("삭제된 살까말까에요!")})
         }
+                })
+        
+        }else{
+
+            //2. 사라마라 요청마다 1씩 더한다
+           if(req.body.type === 'sara'){
+               //sara카운트 올리기(update)
+               Post.findByIdAndUpdate(req.params.postId,{$inc:{sara:1}},{
+                   new:true,
+                   //runValidators:true
+               })
+               .then(()=>{
+                   console.log("사라를 등록했어요!")
+    
+    
+                   //ratio 계산
+                   //마라랑 사라 값 가져오기
+                   //둘이 계산
+                   //ratio에 넣기
+                   
+    
+    //  const post = await Post.updateMany({title:"구름빵"}, 
+    //     {title:"구름빵",
+    //     content:'구름처럼 생김',
+    //         image:'x',
+    //         userId:'60d42c224f9cf13167106903',
+    //         comment:{
+    //             type:false,
+    //             like:7,
+    //             userId:'60d4254dec6bbb2e33526cfb'
+    //         }
+    //     })
+       // .then((update)=>res.json(update).status(200))
+    
+    
+                   //코멭츠를 뽑아내는 기준(현재 포스트아이디)
+               Post.findById(req.params.postId)
+               .then((result)=>{
+               console.log(result)
+               let ratiocal=function(){
+                   let min=Math.min(result.sara,result.mara)
+                   let max=Math.max(result.sara,result.mara)
+                   return (1- min/max)
+                   
+               }
+               let ratio=ratiocal()
+               console.log(ratio)
+               console.log(req.params.postId)
+               const update = Post.updateOne({_id:req.params.postId},{
+                   ratio:ratio
+               }).then((update)=> res.json({comments:result.comment}).status(201))
+       
+              
+                   })
+    
+    
+               })
+               .catch(error=>{console.log(error) 
+                   res.status(404).send("삭제된 살까말까에요!")})
+           
+           }
+           else if(req.body.type==='mara'){
+               //mara카운트 올리기(update)
+               Post.findByIdAndUpdate(req.params.postId,{$inc:{mara:1}},{
+                   new:true,
+                   useFindAndModify:false
+               })
+               .then(()=>{
+                   console.log("마라를 등록했어요!")
+          //코멭츠를 뽑아내는 기준(현재 포스트아이디)
+          Post.findById(req.params.postId)
+          .then((result)=>{
+          //console.log(result)
+          let ratiocal=function(){
+              return Math.abs(1-(result.sara - result.mara)*0.01)
+          }
+          let ratio=ratiocal()
+          console.log(ratio)
+          console.log(req.params.postId)
+          const update = Post.updateOne({_id:req.params.postId},{
+              ratio:ratio
+          }).then((update)=> res.json({comments:result.comment}).status(201))
+    
+         
+              })
+    
+    
+                  
+               })
+           .catch(error=>{console.log(error) 
+           res.status(404).send("삭제된 살까말까에요!")})
+           }
+
+
+
+
+        }
+        
         
         }
         
@@ -269,6 +345,27 @@ try {
                     
                     doc.save()
                     .then(()=>{
+
+
+
+                        //삭제하는 코멘트의 타입이 사라인지 마라인지에 따라
+                        //$inc -1
+                        Post.findByIdAndUpdate(req.params.postId,{$inc:{sara:-1}},{
+                            new:true,
+                            //runValidators:true
+                        })
+
+
+
+
+
+
+
+
+
+
+
+
                         Post.findById(req.params.postId)
                         .then((doc)=>{
                             console.log(doc)
