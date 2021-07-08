@@ -261,65 +261,116 @@ try {
         //해당 코멘트 쓴 userId와 req로 들어온 userId 서로 비교해서 
         //같지 않을때만 실행되도록
        
-        Post.updateOne({
+
+
+Post.findOne({
             "_id": req.params.postId, //this is level O select
             "comment": {
-                "$elemMatch": {
+                $elemMatch: {
                     "_id": req.params.commentId, //this is level one select
                  
                 }
             }
         },
-            {
-                // "$set": {
-                //     "comment.$[outer].like": +1,
-                // },
-                "$inc": {
-                    "comment.$[outer].like": 1,
+        {
+            'comment': {
+                $elemMatch : {
+                    '_id' : req.params.commentId
                 }
-            },
-            {
-                "arrayFilters": [
-                    { "outer._id":req.params.commentId }, 
-                   
-                ]
-            })
-                    .then((out)=>{
-                            console.log("like updated")
-                            
-                            console.log(out)
+            }
+        }, 
+        // function(err,result){
+        //     console.log(result.comment);
+        //    console.log(result.comment[0].like);
+        //    if(result.comment[0].like===req.body.userId){
+        //        res.status(400).send("이미 좋아요를 눌렀습니다.")
+        //    }
+        // }
+        )
+        .then((output)=>{
+            console.log(output)
+            console.log(output.comment[0].like)
+            
+            let isexitst=[]
+            for(let i=0;i<output.comment[0].like.length;i++){
+             if(output.comment[0].like[i].toString() === req.body.userId)
+                isexitst.push(output.comment[0].like[i])
+              
+            }
+            console.log(isexitst)
 
-                            Post.findOne({
-                                "_id": req.params.postId, //this is level O select
-                                "comment": {
-                                    "$elemMatch": {
-                                        "_id": req.params.commentId, //this is level one select
-                                     
-                                    }
-                                }
-                            },
-                            {
-                            
-                                comment:{
-                                    $elemMatch:{
-                                        _id:req.params.commentId
-                                    },
-                                }
+            if(isexitst.length > 0){
+                       res.status(400).send("이미 좋아요를 눌렀습니다.")
+                   }
+                   else{
+
+                    Post.updateOne({
+                        "_id": req.params.postId, //this is level O select
+                        "comment": {
+                            "$elemMatch": {
+                                "_id": req.params.commentId, //this is level one select
+                             
                             }
-                            
-                            )
-                            .then((liked)=>{console.log(liked.comment[0].like)
-                                if(out.nModified !== 0){
-                                res.status(200).json({"like":liked.comment[0].like})
-                                }else{
-                                    res.status(500).send("삭제된 사라마라예요!")
-                                }
-                            })
-
+                        }
+                    },
+                        {
+                            // "$set": {
+                            //     "comment.$[outer].like": +1,
+                            // },
+                            "$push": {
+                                "comment.$[outer].like": req.body.userId,
+                            }
+                        },
+                        {
+                            "arrayFilters": [
+                                { "outer._id":req.params.commentId }, 
+                               
+                            ],
+                            "upsert":true
                         })
-    
-        .catch(error=>{console.log(error) 
-            res.status(500).send("삭제된 사라마라예요!")})
+                                .then((out)=>{
+                                        console.log("like updated")
+                                        
+                                        console.log(out)
+            //////////////////////////////////////////////////////
+                                        Post.findOne({
+                                            "_id": req.params.postId, //this is level O select
+                                            "comment": {
+                                                "$elemMatch": {
+                                                    "_id": req.params.commentId, //this is level one select
+                                                 
+                                                }
+                                            }
+                                        },
+                                        {
+                                        
+                                            comment:{
+                                                $elemMatch:{
+                                                    _id:req.params.commentId
+                                                },
+                                            }
+                                        }
+                                        
+                                        )
+                                        .then((liked)=>{console.log(liked.comment[0].like)
+                                            if(out.nModified !== 0){
+                                            res.status(200).json({"like":liked.comment[0].like.length})
+                                            }else{
+                                                res.status(500).send("삭제된 사라마라예요!")
+                                            }
+                                        })
+            
+                                    })
+                
+                    .catch(error=>{console.log(error) 
+                        res.status(500).send("삭제된 사라마라예요!")})
+
+                   }
+        })
+        
+
+
+       
     
     }
     else if(isOpen === false){
