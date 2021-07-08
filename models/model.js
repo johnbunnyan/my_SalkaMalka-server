@@ -25,10 +25,8 @@ point:{
 
 const CommentSchema = new schema({
    
-    like:{
-        type:Number,
-        default:0
-    },
+    like:[{ type: schema.Types.ObjectId, ref: 'User' }]
+    ,
     content:{
         type:String,
         //required:true,
