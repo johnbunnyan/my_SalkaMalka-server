@@ -28,10 +28,15 @@ newCommentController:async(req,res)=>{
         
         if(isOpen === true){
             //사라나 마라는 무조건 있어야한다.
-            //console.log("wwwwwww")
         if(req.body.type === 'sara'||req.body.type === 'mara'){
             
-          //1. 코멘트 콘텐트가 있으면 배열에 넣는다
+
+
+
+
+
+
+// 코멘트 콘텐트가 있으면 배열에 넣는다
             if(req.body.content){
                  Post.findById(req.params.postId)
                 .then((doc)=>{
@@ -58,8 +63,6 @@ newCommentController:async(req,res)=>{
                 console.log("사라를 등록했어요!")
  
  
- 
-                //코멭츠를 뽑아내는 기준(현재 포스트아이디)
             Post.findById(req.params.postId)
             .then((result)=>{
             console.log(result)
@@ -74,7 +77,7 @@ newCommentController:async(req,res)=>{
             console.log(req.params.postId)
             const update = Post.updateOne({_id:req.params.postId},{
                 ratio:ratio
-            }).then((update)=> res.json({comments:result.comment}).status(201))
+            }).then((update)=> res.json({comments:result.comment, sara:result.sara, mara:result.mara}).status(201))
     
            
                 })
@@ -93,7 +96,7 @@ newCommentController:async(req,res)=>{
             })
             .then(()=>{
                 console.log("마라를 등록했어요!")
-       //코멭츠를 뽑아내는 기준(현재 포스트아이디)
+       
        Post.findById(req.params.postId)
        .then((result)=>{
        //console.log(result)
@@ -105,7 +108,7 @@ newCommentController:async(req,res)=>{
        console.log(req.params.postId)
        const update = Post.updateOne({_id:req.params.postId},{
            ratio:ratio
-       }).then((update)=> res.json({comments:result.comment}).status(201))
+       }).then((update)=> res.json({comments:result.comment, sara:result.sara, mara:result.mara}).status(201))
  
       
            })
@@ -119,6 +122,8 @@ newCommentController:async(req,res)=>{
                 })
         
         }else{
+//comment를 쓰지 않았을 때 그냥 카운트만 올리기
+
 
             //2. 사라마라 요청마다 1씩 더한다
            if(req.body.type === 'sara'){
@@ -166,7 +171,7 @@ newCommentController:async(req,res)=>{
                console.log(req.params.postId)
                const update = Post.updateOne({_id:req.params.postId},{
                    ratio:ratio
-               }).then((update)=> res.json({comments:result.comment}).status(201))
+               }).then((update)=> res.json({comments:result.comment, sara:result.sara, mara:result.mara}).status(201))
        
               
                    })
@@ -197,7 +202,7 @@ newCommentController:async(req,res)=>{
           console.log(req.params.postId)
           const update = Post.updateOne({_id:req.params.postId},{
               ratio:ratio
-          }).then((update)=> res.json({comments:result.comment}).status(201))
+          }).then((update)=> res.json({comments:result.comment, sara:result.sara, mara:result.mara}).status(201))
     
          
               })
