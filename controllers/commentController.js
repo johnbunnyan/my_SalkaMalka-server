@@ -456,13 +456,13 @@ const { userId } = accessTokenData;
                               myComments = myComments.filter(i => i.userId === userId)
                       console.log(myComments)
                              
+                      res.status(200).json({"comments":doc.comment, "userComments":myComments })
                             })
                           
 
 
 
 
-                            res.status(200).json({"comments":doc.comment, "userComments":myComments })
                         })
                     })
                     })
