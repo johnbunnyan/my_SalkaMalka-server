@@ -15,12 +15,13 @@ const {Post} = require('./models/model')
 const app = express();
 const port = process.env.PORT || 5000;
 
-const myLogger = function (req, res, next) {
-    console.log(`request: ${req.method}, path: ${req.path}`); // 이 부분을 req, res 객체를 이용해 고치면, 여러분들은 모든 요청에 대한 로그를 찍을 수 있습니다.
-    next();
-  };
-  
-app.use(myLogger);
+// const myLogger = function (req, res, next) {
+//     console.log(`request: ${req.method}, path: ${req.path}`); 
+//     next();
+//   };
+
+//app.use(myLogger);
+  app.use(logger('dev'))
   
 
 app.use(express.json()); //req.body 접근하게 해주는 미들웨어

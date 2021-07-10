@@ -28,6 +28,7 @@ module.exports = {
         }
         const sort = { $sort: { createdAt: -1 } };
         const orderByDate = await Post.aggregate([query, sort]);
+        //console.log(orderByDate[2].comment)
         if (orderByDate) {
           res.status(200).send({posts:orderByDate});
         } else {
@@ -83,8 +84,10 @@ module.exports = {
             }
         };
         const sort2 = { $sort: { ratio: 1 } };
-        const orderByHotTopic = await Post.aggregate([query2, sort2]);
+        const sort3 ={$match:{sara:{$gte:2}, mara:{$gte:2}}};
 
+        const orderByHotTopic = await Post.aggregate([query2, sort2,sort3]);
+console.log(orderByHotTopic)
         if (orderByHotTopic) {
           res.status(200).send({posts:orderByHotTopic});
         } else {

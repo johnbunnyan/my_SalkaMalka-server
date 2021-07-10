@@ -43,9 +43,9 @@ module.exports = {
 
   signOutController: async (req, res) => {
 
-    // res.clearCookie('refreshToken');
-    // res.status(200).send('다음에 또 찾아주세요.');
-    // return;
+    res.clearCookie('refreshToken');
+    res.status(200).send('다음에 또 찾아주세요.');
+    return;
     const accessTokenData = isAuthorized(req,res);
 
     console.log(accessTokenData);
