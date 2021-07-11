@@ -392,6 +392,8 @@ Post.findOne({
     //코멘트 달면 응답으로 해당 포스트아이디도 주는데 저장했다가 삭제할때 줄수 있나?
     deleteCommentController:async(req,res)=>{
         const accessTokenData = isAuthorized(req,res)
+console.log(accessTokenData)
+const { userId } = accessTokenData;
 
         if(accessTokenData){
             Post.findById(req.params.postId)
@@ -412,21 +414,55 @@ Post.findOne({
                         })
 
 
-
-
-
-
-
-
-
-
-
-
                         Post.findById(req.params.postId)
                         .then((doc)=>{
                             console.log(doc)
                             console.log("comment deleted")
-                            res.status(200).json({"comments":doc.comment})
+                            //포스트들의 코멘트들 아이디까지 가서 아이디까고
+                            //그 이메일이 맞아떨어진 거만 골라서 보내주기
+                            let myComments = [];
+
+                            function addComments(json) {
+                              let comments = json.comment;
+                              let postId = json._id;
+                      
+                              comments.forEach(comment => {
+                                comment.postId = postId;
+                                comment.commentId = comment._id;
+                                delete comment._id;
+                              });
+                      
+                              myComments = [...myComments, ...comments];
+                            }
+                      
+                            const query = { "comment.userId": userId };
+                            const project = {
+                              'comment.userId': 1,
+                              'comment.type': 1,
+                              'comment.like': 1,
+                              'comment.content': 1,
+                              'comment._id': 1
+                            }
+                      
+                            Post.find(query)
+                            .cursor()
+                            .on('data', function(doc) {
+                              let str = JSON.stringify(doc);
+                              let json = JSON.parse(str);
+                              addComments(json);
+                            })
+                            .on('end', function() {
+                      
+                              myComments = myComments.filter(i => i.userId === userId)
+                      console.log(myComments)
+                             
+                      res.status(200).json({"comments":doc.comment, "userComments":myComments })
+                            })
+                          
+
+
+
+
                         })
                     })
                     })
