@@ -354,7 +354,7 @@ Post.findOne({
                                         )
                                         .then((liked)=>{console.log(liked.comment[0].like)
                                             if(out.nModified !== 0){
-                                            res.status(200).json({"like":liked.comment[0].like.length})
+                                            res.status(200).json({"like":liked.comment[0].like})
                                             }else{
                                                 res.status(500).send("삭제된 사라마라예요!")
                                             }

@@ -44,7 +44,7 @@ console.log(req.body)
 
   if(req.file){
             const imgData=req.file.path
-            console.log(imgData)
+            console.log(req.file)
   
                 const newPost= new Post({
                     title:req.body.title,
