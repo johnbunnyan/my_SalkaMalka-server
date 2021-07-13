@@ -17,8 +17,8 @@ var _storage = multer.diskStorage({
     },
     //넣을 파일 이름을 어떻게 할거냐(file.~~)
     filename:function(req,file,cb){
-        //cb(null,`${Date.now()}-bezkoder-${file.originalname}`)
-        cb(null,`${file.originalname}`)
+        cb(null,`${Date.now()}-${file.originalname}`)
+        //cb(null,file.originalname)
     }
 })
 
