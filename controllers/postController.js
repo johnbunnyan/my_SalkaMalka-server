@@ -23,7 +23,7 @@ module.exports = {
 
     uploadController:async(req,res)=>{
  
-
+console.log(req.body)
 
             //이미지를 DB로 넣는 상황
 
@@ -49,6 +49,7 @@ console.log(req.body)
                 const newPost= new Post({
                     title:req.body.title,
                     content:req.body.content,
+                    keyword:req.body.keyword,
                     image:imgData,
                     userId:req.body.userId,
                 })
@@ -67,6 +68,7 @@ console.log(req.body)
                 const newPost= new Post({
                     title:req.body.title,
                     content:req.body.content,
+                    keyword:req.body.keyword,
                     // image:imgData,
                     userId:req.body.userId,
                 })
@@ -141,6 +143,143 @@ const accessTokenData = isAuthorized(req,res)
 
 
 if(accessTokenData){
+
+
+
+//(옵션)
+//req.body.judgement === 코멘트아이디 ->의 isJudgement를 true로 +코멘트 쓴사람 point 1추가
+
+if(req.body.judgement){
+    
+    Post.updateOne({
+        "_id": req.params.postId, //this is level O select
+        "comment": {
+            "$elemMatch": {
+                "_id": req.body.judgement, //this is level one select
+             
+            }
+        }
+    },
+        {
+            // "$set": {
+            //     "comment.$[outer].like": +1,
+            // },
+            "$set": {
+                "comment.$[outer].isJudgement": true,
+            }
+        },
+        {
+            "arrayFilters": [
+                { "outer._id":req.body.judgement}, 
+               
+            ]
+        })
+                .then((out)=>{
+                        console.log("judgement updated")
+                        
+                        console.log(out)
+                        
+                        Post.findOne({
+                            "_id": req.params.postId, //this is level O select
+                            "comment": {
+                                "$elemMatch": {
+                                    "_id": req.body.judgement, //this is level one select
+                                 
+                                }
+                            }
+                        },
+                        {
+                        
+                            comment:{
+                                $elemMatch:{
+                                    _id:req.body.judgement
+                                },
+                            }
+                        }
+                        
+                        ).populate('comment.userId')
+                        .then((liked)=>{console.log(liked.comment[0].userId)
+                            let id=liked.comment[0].userId._id
+                            console.log(id)
+                            //liked.comment[0].userId.point.updateOne({$inc:{point:1}})
+                        User.findByIdAndUpdate(id, {$inc:{point:1}},
+                            {new:true}
+                            )
+                        .then((out)=>console.log(out))
+                        })
+                })
+
+    }
+
+    //req.body.best === 배열속 코멘트아이디들 ->각각의 isBest를 true로 +코멘트 쓴사람 point 1추가
+    if(req.body.best){
+    req.body.best.map((el)=>
+    
+    Post.updateOne({
+        "_id": req.params.postId, //this is level O select
+        "comment": {
+            "$elemMatch": {
+                "_id": el, //this is level one select
+             
+            }
+        }
+    },
+        {
+            // "$set": {
+            //     "comment.$[outer].like": +1,
+            // },
+            "$set": {
+                "comment.$[outer].isBest": true,
+            }
+        },
+        {
+            "arrayFilters": [
+                { "outer._id":el}, 
+               
+            ]
+        })
+                .then((out)=>{
+                        console.log("judgement updated")
+                        
+                        console.log(out)
+                        
+                        Post.findOne({
+                            "_id": req.params.postId, //this is level O select
+                            "comment": {
+                                "$elemMatch": {
+                                    "_id": el, //this is level one select
+                                 
+                                }
+                            }
+                        },
+                        {
+                        
+                            comment:{
+                                $elemMatch:{
+                                    _id:el
+                                },
+                            }
+                        }
+                        
+                        ).populate('comment.userId')
+                        .then((liked)=>{console.log(liked.comment[0].userId)
+                            let id=liked.comment[0].userId._id
+                            console.log(id)
+                            //liked.comment[0].userId.point.updateOne({$inc:{point:1}})
+                        User.findByIdAndUpdate(id, {$inc:{point:1}},
+                            {new:true}
+                            )
+                        .then((out)=>console.log(out))
+                        })
+                })
+    )
+    
+        }
+
+
+
+
+
         Post.findByIdAndUpdate(req.params.postId,{isOpen:false},{
             new:true,
             //runValidators:true
