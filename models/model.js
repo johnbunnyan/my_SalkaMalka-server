@@ -59,6 +59,10 @@ const PostSchema = new schema({
         type:String,
         required:true,
     },
+    keyword:{
+         type: [String]
+    }
+    ,   
     image:{
         type:String,
         default:''
@@ -89,7 +93,7 @@ const PostSchema = new schema({
     setDefaultsOnInsert:true,
     default:0
     },
-    
+  
         
 //comment컨트롤러에서 추가!!
     comment:{
