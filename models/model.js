@@ -116,7 +116,21 @@ const PostSchema = new schema({
 //         default:Date.now
 //     }
 // })
+const SalkamalkakingSchema = new schema({
+  
+    _id: { type: String },
+userId:{
+    type:String
+},
+point:{
+    type:Number,
+}
+},{timestamps:true}
+)
+
+
 const User = mongoose.model("User",UserSchema)
 const Post = mongoose.model("Post", PostSchema)
+const Salkamalkaking = mongoose.model("Salkamalkaking", SalkamalkakingSchema)
 
-module.exports = { User, Post }
+module.exports = { User, Post, Salkamalkaking }
