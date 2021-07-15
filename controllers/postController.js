@@ -251,27 +251,26 @@ if(req.body.judgement){
                         console.log("judgement updated")
                         
                         console.log(out)
-                        
+                        console.log(el)
                         Post.findOne({
                             "_id": req.params.postId, //this is level O select
                             "comment": {
-                                "$elemMatch": {
+                                $elemMatch: {
                                     "_id": el, //this is level one select
                                  
                                 }
                             }
                         },
                         {
-                        
-                            comment:{
-                                $elemMatch:{
-                                    _id:el
-                                },
+                            'comment': {
+                                $elemMatch : {
+                                    '_id' : el
+                                }
                             }
-                        }
+                        }, 
                         
                         ).populate('comment.userId')
-                        .then((liked)=>{//console.log(liked.comment[0].userId)
+                        .then((liked)=>{//console.log(liked)
                             let id=liked.comment[0].userId._id
                             //console.log(id)
                             //liked.comment[0].userId.point.updateOne({$inc:{point:1}})
@@ -302,7 +301,7 @@ if(req.body.judgement){
         })
         .then((posts)=> {
             if (posts) {
-                res.json("더이상 사라마라를 받지 않아요.").status(200)
+                res.status(200).json("더이상 사라마라를 받지 않아요.")
             } else {
                 res.status(404).json('삭제된 살까말까예요!');
             }
