@@ -15,7 +15,7 @@ const {isAuthorized,
 const {User} = require('../models/model')
 const {Post} = require('../models/model')
 
-
+const {comparePoint} =require('./kingMaker');
 
 
 module.exports = {
@@ -198,19 +198,28 @@ if(req.body.judgement){
                         }
                         
                         ).populate('comment.userId')
-                        .then((liked)=>{console.log(liked.comment[0].userId)
+                        .then((liked)=>{//console.log(liked.comment[0].userId)
                             let id=liked.comment[0].userId._id
-                            console.log(id)
+                            //console.log(id)
                             //liked.comment[0].userId.point.updateOne({$inc:{point:1}})
                         User.findByIdAndUpdate(id, {$inc:{point:1}},
                             {new:true}
                             )
-                        .then((out)=>console.log(out))
+                        .then((out)=>{
+                            //console.log(out)
+                        //여기서 킹메이킹
+                
+                        let compared = comparePoint(out)
+                        })
                         })
                 })
 
     }
 
+
+
+
+    
     //req.body.best === 배열속 코멘트아이디들 ->각각의 isBest를 true로 +코멘트 쓴사람 point 1추가
     if(req.body.best){
     req.body.best.map((el)=>
@@ -242,38 +251,44 @@ if(req.body.judgement){
                         console.log("judgement updated")
                         
                         console.log(out)
-                        
+                        console.log(el)
                         Post.findOne({
                             "_id": req.params.postId, //this is level O select
                             "comment": {
-                                "$elemMatch": {
+                                $elemMatch: {
                                     "_id": el, //this is level one select
                                  
                                 }
                             }
                         },
                         {
-                        
-                            comment:{
-                                $elemMatch:{
-                                    _id:el
-                                },
+                            'comment': {
+                                $elemMatch : {
+                                    '_id' : el
+                                }
                             }
-                        }
+                        }, 
                         
                         ).populate('comment.userId')
-                        .then((liked)=>{console.log(liked.comment[0].userId)
+                        .then((liked)=>{//console.log(liked)
                             let id=liked.comment[0].userId._id
-                            console.log(id)
+                            //console.log(id)
                             //liked.comment[0].userId.point.updateOne({$inc:{point:1}})
                         User.findByIdAndUpdate(id, {$inc:{point:1}},
                             {new:true}
                             )
-                        .then((out)=>console.log(out))
+                        .then((out)=>{
+                            //console.log(out)
+                        //여기서 킹메이킹
+                        let compared = comparePoint(out)
+                        
+                        
+                        })
                         })
                 })
     )
-    
+  
+
         }
 
 
@@ -286,7 +301,7 @@ if(req.body.judgement){
         })
         .then((posts)=> {
             if (posts) {
-                res.json("더이상 사라마라를 받지 않아요.").status(200)
+                res.status(200).json("더이상 사라마라를 받지 않아요.")
             } else {
                 res.status(404).json('삭제된 살까말까예요!');
             }
