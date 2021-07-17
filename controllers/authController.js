@@ -13,12 +13,8 @@ const axios = require('axios');
 
 module.exports = {
   signInController: async (req, res) => {
-    console.log(req.body)
     const query = { email: req.body.email, password: req.body.password, provider: 'local' };
-    console.log(query);
     const userInfo = await User.findOne(query);
-    // { _id: _id, email: email, password: password, provider: provider }
-    console.log(userInfo);
 
     if (!userInfo) {
       res.status(404).send('이메일 및 비밀번호를 확인해 주세요.');
@@ -42,13 +38,8 @@ module.exports = {
   },
 
   signOutController: async (req, res) => {
-
-    res.clearCookie('refreshToken');
-    res.status(200).send('다음에 또 찾아주세요.');
-    return;
     const accessTokenData = isAuthorized(req,res);
 
-    console.log(accessTokenData);
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
@@ -70,12 +61,9 @@ module.exports = {
       const insertMe = await new User(newUser)
       .save()
      
-
       if (!insertMe) {
-        console.log('insert err');
         res.status(500).send('err');
       } else {
-        console.log(insertMe);
         res.status(201).send('살까말까에 오신 것을 환영합니다.');
       }
     }
@@ -123,7 +111,6 @@ module.exports = {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else {
       const token = authorization.split(" ")[1];
-      console.log(token);
       let email = ''
       try {
         const ticket = await client.verifyIdToken({
@@ -132,12 +119,9 @@ module.exports = {
         })
     
         email = ticket.getPayload().email;
-        console.log(email);
       } catch (err) {
-        console.log(err);
         res.status(401).send('토큰이 유효하지 않아요.');
       }
-      console.log('email', email);
       const query = { email: email, provider: 'google' };
       const googleUserInfo = await User.findOne(query);
 
@@ -153,7 +137,6 @@ module.exports = {
           res.status(500).send('err');
         });
 
-        console.log(insertMe);
         const { email, provider } = insertMe;
         const userId = insertMe._id;
         const bookmarks = insertMe.bookmarks;
@@ -165,7 +148,7 @@ module.exports = {
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(201)
-        .send({ userId, email, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
+        .send({ userId, email, bookmarks, accessToken, accessTokenExpiry, refreshTokenExpiry, issueDate });
       }
 
       // 동일 유저를 찾을 수 있어 해당 유저로 로그인 진행
@@ -194,9 +177,6 @@ module.exports = {
 
   kakaoSignInController: async (req, res) => {
     const authorization = req.headers["Authorization"] || req.headers["authorization"] || req.body.headers.Authorization;
-    console.log(req.headers);
-    
-    console.log(authorization)
 
     if (!authorization) {
       res.status(401).send('토큰이 유효하지 않아요.');
@@ -216,7 +196,6 @@ module.exports = {
 
       const query = { email: email, provider: 'kakao' };
       const kakaoUserInfo = await User.findOne(query);
-      console.log(query);
       // 동일 유저를 찾을 수 없어 새로운 유저 생성
       if (!kakaoUserInfo) {
         console.log('you are new')
@@ -229,7 +208,6 @@ module.exports = {
           res.status(500).send('err');
         });
 
-        console.log(insertMe)
         const { email, provider } = insertMe;
         const userId = insertMe._id;
         const bookmarks = insertMe.bookmarks;
@@ -239,7 +217,6 @@ module.exports = {
         const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
         const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
 
-        console.log('email', email, 'userId', userId)
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(201)
@@ -258,7 +235,6 @@ module.exports = {
         const accessTokenExpiry = new Date((Date.parse(issueDate) + 1209600000)); // +3h
         const refreshTokenExpiry = new Date((Date.parse(issueDate) + 10800000)); // +14d
         
-        console.log('user', kakaoUserInfo)
         res
         .cookie('refreshToken', refreshToken, { httpOnly: true })
         .status(200)

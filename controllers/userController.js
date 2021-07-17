@@ -1,6 +1,3 @@
-/* option 
-require("dotenv").config();
-*/
 const mongoose = require("mongoose")
 const { isAuthorized } = require('./tokenMethod');
 const ObjectId = require('mongoose').Types.ObjectId; 
@@ -26,16 +23,12 @@ module.exports = {
   },
   
   myCommentsController: async (req, res) => {
-    console.log('my comments');
     const accessTokenData = isAuthorized(req,res);
 
     if (!accessTokenData) {
       res.status(401).send('토큰이 유효하지 않아요.');
     } else if (accessTokenData) {
       const { userId } = accessTokenData;
-      // const userId = req.path.split('/')[1];
-      console.log(userId)
-      // needs testing
       let myComments = [];
 
       function addComments(json) {
@@ -68,9 +61,7 @@ module.exports = {
         addComments(json);
       })
       .on('end', function() {
-
         myComments = myComments.filter(i => i.userId === userId)
-
         if (myComments) {
           res.status(200).send({comments:myComments});
         } else {
@@ -111,9 +102,7 @@ module.exports = {
       const { userId, provider } = accessTokenData;
       const userQuery = { _id: userId, provider };
       const user = await User.findOne(userQuery).populate('bookmarks')
-      console.log(user)
       const myBookmarks = user.bookmarks
-
       if (myBookmarks) {
         res.status(200).send({bookmarks:myBookmarks});
       } else {
@@ -132,38 +121,30 @@ module.exports = {
       const { postId } = req.body;
       const postQuery = { _id: postId }
       const postToAdd = await Post.findOne(postQuery);
-      //console.log(postToAdd)
-      
-
       if (!postToAdd) {
-        res.status(404).send('삭제된 살까말까에요!');
+        res.status(404).send('삭제된 살까말까에요.');
       } else {
         const { userId, provider } = accessTokenData;
         const userQuery = { _id: userId, provider };
         const user = await User.findOne(userQuery);
         const beforelength = user.bookmarks.length;
-        //console.log(user.bookmarks)
       
         let isexitst=[]
         for(let i=0;i<user.bookmarks.length;i++){
          if(user.bookmarks[i].toString() === postId)
             isexitst.push(user.bookmarks[i])
-          
         }
-        console.log(isexitst)
         if(isexitst.length > 0){
-          res.status(409).send("이미 북마크에 있어요.")
+          res.status(409).send("이미 저장한 책갈피에요.")
         }else{
           user.bookmarks.push(postId)
           user.save()
           const afterlength = user.bookmarks.length;
-          
           if (afterlength !== beforelength) {
             res.status(201).send('책갈피를 추가했어요.');
           } else {
             res.status(500).send('err');
           }
-
         }
       }
     } else {
@@ -181,7 +162,7 @@ module.exports = {
       const postToDelete = await Post.findOne(postQuery);
 
       if (!postToDelete) {
-        res.status(404).send('삭제된 살까말까에요!');
+        res.status(404).send('삭제된 살까말까에요.');
       } else {
         const { userId, provider } = accessTokenData;
         const userQuery = { _id: userId, provider };
