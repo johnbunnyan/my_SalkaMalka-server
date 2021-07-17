@@ -29,12 +29,10 @@ const CommentSchema = new schema({
     ,
     content:{
         type:String,
-        //required:true,
         default:'no comment'
     },
     type:{
         type:String,
-        //required:true,
         default:''
     },
     userId:{type:schema.Types.ObjectId, ref:'User', required:true},
@@ -73,11 +71,6 @@ const PostSchema = new schema({
     },
     userId:{type:schema.Types.ObjectId, ref:'User', required:true},
 
-    
-    // type:{
-    //     type:Boolean,
-    //     required:true,
-    // },
     sara:{
     type:Number,
     default:0
@@ -95,7 +88,6 @@ const PostSchema = new schema({
     },
   
         
-//comment컨트롤러에서 추가!!
     comment:{
         type:[CommentSchema],
         default:[]
@@ -104,18 +96,6 @@ const PostSchema = new schema({
     },
     {timestamps:true}
     )
-
-
-
-// const PostSchema = new mongoose.Schema({
-//     title,content,image,userId,date, comment{_id,type,like,content(op),userId}
-//     title:String,
-//     age:Number,
-//     saveDate:{
-//         type:Date,
-//         default:Date.now
-//     }
-// })
 const SalkamalkakingSchema = new schema({
   
     _id: { type: String },

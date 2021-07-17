@@ -1,9 +1,5 @@
-/* option 
-require("dotenv").config();
-*/
-
 const { Post, Salkamalkaking } = require('../models/model');
-let king =''
+let king ='';
 
 module.exports = {
   mainController: async (req, res) => {
@@ -30,22 +26,15 @@ module.exports = {
         }
         const sort = { $sort: { createdAt: -1 } };
         const orderByDate = await Post.aggregate([query, sort]);
-        //console.log(orderByDate[2].comment)
          Salkamalkaking.findOne({_id:"default"})
-        .then((output)=>{
-          console.log(output)
-          king =output.userId
-        })
+        .then((output)=>{king =output.userId})
         .then(()=>{
           if (orderByDate) {
             res.status(200).send({posts:orderByDate,Salkamalkaking:king});
           } else {
            res.status(500).send(err);
           }
-          
-
         })
-       
         break;
 
       case 'popular':
@@ -69,23 +58,15 @@ module.exports = {
         };
         const sort1 = { $sort: { commentCount: -1 } };
         const orderByPopular = await Post.aggregate([query1, sort1]);
-
         Salkamalkaking.findOne({_id:"default"})
-        .then((output)=>{
-          console.log(output)
-        king =output.userId
-        })
+        .then((output)=>{king =output.userId})
         .then(()=>{
           if (orderByPopular) {
             res.status(200).send({posts:orderByPopular,Salkamalkaking:king});
           } else {
             res.status(500).send(err);
           }
-          
-
         })
-      
-
         break;
 
       case 'hot-topic':
@@ -108,32 +89,22 @@ module.exports = {
         };
         const sort2 = { $sort: { ratio: 1 } };
         const sort3 ={$match:{sara:{$gte:2}, mara:{$gte:2}}};
-
         const orderByHotTopic = await Post.aggregate([query2, sort2,sort3]);
-//console.log(orderByHotTopic)
-Salkamalkaking.findOne({_id:"default"})
-.then((output)=>{
-  console.log(output)
-  king =output.userId
-})
-.then(()=>{
-  if (orderByHotTopic) {
-    res.status(200).send({posts:orderByHotTopic,Salkamalkaking:king});
-  } else {
-    res.status(500).send(err);
-  }
-  
-
-})
-      
-
+        Salkamalkaking.findOne({_id:"default"})
+        .then((output)=>{king =output.userId})
+        .then(()=>{
+          if (orderByHotTopic) {
+            res.status(200).send({posts:orderByHotTopic,Salkamalkaking:king});
+          } else {
+            res.status(500).send(err);
+          }
+        })
         break;
 
       default:
         res.sendStatus(404);
-        
         break;
-    } 
+    }
   },
 
   searchController: async (req, res) => {
