@@ -113,11 +113,12 @@ module.exports = {
       const token = authorization.split(" ")[1];
       let email = ''
       try {
+        // 프론트에서 id토큰을 넘겨주면 그것을
+        //  'google-auth-library'  -> OAuth2Client -> client가 확인
         const ticket = await client.verifyIdToken({
           idToken: token,
           audience: process.env.GOOGLE_AUTH_CODE
         })
-    
         email = ticket.getPayload().email;
       } catch (err) {
         res.status(401).send('토큰이 유효하지 않아요.');
@@ -187,11 +188,17 @@ module.exports = {
       {},
       {
         headers: {
+          // Authorization: `Bearer ${getKakaoToken.data.access_token}`,
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
         }
       })
-      .then(res => res.data.id + '@SalkaMalka.com')
+      // 여기서 서버는 클라에서 받은 액세스 토큰의 진위를 판별하기 위해 카카오에게 post를 한다.
+      .then(res => {
+        const kakaoUser = res.data;
+        const emailExtract = kakaoUser.kakao_account.email;
+        return emailExtract;
+      })
       .catch(err => console.log(err));
 
       const query = { email: email, provider: 'kakao' };

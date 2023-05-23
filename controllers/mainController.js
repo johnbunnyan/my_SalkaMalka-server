@@ -26,8 +26,11 @@ module.exports = {
         }
         const sort = { $sort: { createdAt: -1 } };
         const orderByDate = await Post.aggregate([query, sort]);
-         Salkamalkaking.findOne({_id:"default"})
-        .then((output)=>{king =output.userId})
+
+        await Salkamalkaking.findOne({_id:"default"})
+        .then((output)=>{
+          king = output ? output.userId : ''
+        })
         .then(()=>{
           if (orderByDate) {
             res.status(200).send({posts:orderByDate,Salkamalkaking:king});
@@ -59,7 +62,7 @@ module.exports = {
         const sort1 = { $sort: { commentCount: -1 } };
         const orderByPopular = await Post.aggregate([query1, sort1]);
         Salkamalkaking.findOne({_id:"default"})
-        .then((output)=>{king =output.userId})
+        .then((output)=>king = output ? output.userId : '')
         .then(()=>{
           if (orderByPopular) {
             res.status(200).send({posts:orderByPopular,Salkamalkaking:king});
@@ -91,7 +94,7 @@ module.exports = {
         const sort3 ={$match:{sara:{$gte:2}, mara:{$gte:2}}};
         const orderByHotTopic = await Post.aggregate([query2, sort2,sort3]);
         Salkamalkaking.findOne({_id:"default"})
-        .then((output)=>{king =output.userId})
+        .then((output)=>king = output ? output.userId : '')
         .then(()=>{
           if (orderByHotTopic) {
             res.status(200).send({posts:orderByHotTopic,Salkamalkaking:king});

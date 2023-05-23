@@ -13,7 +13,7 @@ const {User} = require('./models/model')
 const {Post} = require('./models/model')
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 2000;
 
 // const myLogger = function (req, res, next) {
 //     console.log(`request: ${req.method}, path: ${req.path}`); 
@@ -59,14 +59,15 @@ app.get('/search',mainController.searchController)
 app.use('/', (req,res,next)=>{
 
     
-    // //🍀 User seeding(create) test////////////////
+    //🍀 User seeding(create) test////////////////
     // const newUser= new User({
-    //     email:"jenny@codestates.com",
+    //     email:"wtf@codestates.com",
     //     password:'8888'
     // })
     // newUser.save().then(()=>{
     //     console.log("new user saved")
     // })
+    // res.json(newPost).status(200)
 
      //🍀 post.comment seeding(create) test////////////////
      //console.log(Post)
@@ -136,7 +137,7 @@ app.use('/', (req,res,next)=>{
     //Post.find().populate('userId').populate('comment.userId').then((posts)=>  res.json(posts).status(200))
     
     /////////////////////////////
-    res.status(200).send("hello I'm server🧞, please request me with more endpoints🚥")
+     res.status(200).send("hello I'm server🧞, please request me with more endpoints🚥")
     
     });
 
